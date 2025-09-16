@@ -1,41 +1,94 @@
-# Tutorhouse Shoppertainment App
+# 🎓 Tutorhouse Shoppertainment App
+**"TikTok for Tutor Discovery"** - A vertical video feed platform where students discover tutors through short videos and book trial sessions.
 
-A TikTok-style mobile app for discovering tutors through vertical video feeds and booking 1-to-1 tutoring sessions.
+[![Flutter](https://img.shields.io/badge/Flutter-3.32.1-blue.svg)](https://flutter.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green.svg)](https://supabase.com/)
+[![Agora](https://img.shields.io/badge/Agora-Live%20Streaming-orange.svg)](https://agora.io/)
+[![Stripe](https://img.shields.io/badge/Stripe-Payments-purple.svg)](https://stripe.com/)
 
-## Features
+## 🚀 Live Demo
+The app is currently running and can be tested by running:
+```bash
+flutter run -d chrome
+```
 
-- **TikTok-style Video Feed**: Vertical scrolling video discovery
-- **Tutor Profiles**: Enhanced profiles with intro videos, ratings, and availability
-- **Live Streaming**: Real-time tutoring sessions using Agora
-- **Booking System**: Seamless session booking with Stripe payments
-- **Session Management**: Google Meet integration and whiteboard support
+## 📱 Features
 
-## Tech Stack
+### ✅ **Fully Implemented**
+- **🎬 TikTok-Style Video Feed** - Vertical scrolling with swipe gestures
+- **🔐 Authentication System** - Sign up/sign in with persistent login
+- **👨‍🏫 Tutor Profiles** - 7 sample tutors with realistic data
+- **📅 Booking System** - Calendar integration with time slot selection
+- **🎥 Live Streaming** - Agora integration with raise hand feature
+- **💳 Payment Integration** - Stripe demo mode for trials
+- **📧 Email Notifications** - Booking confirmations with Google Meet links
+- **🌐 Web Platform** - Full Chrome browser support
+- **📱 Responsive Design** - Mobile-first dark theme UI
+- **💾 Data Persistence** - SharedPreferences + localStorage
+- **🔄 State Management** - Riverpod for authentication and tutor data
 
-- **Frontend**: Flutter (iOS + Android)
-- **Backend**: Supabase (PostgreSQL, Auth, Real-time, Storage)
-- **Live Streaming**: Agora.io SDK
-- **Payments**: Stripe API
-- **Video Calls**: Google Meet API
-- **Whiteboard**: Custom whiteboard.tutorhouse.co.uk integration
+### ⚠️ **Partially Implemented**
+- **📱 Mobile Platform** - Not yet tested on iOS/Android
+- **🎥 Live Streaming** - Agora compilation errors (core app works)
+- **🖼️ Image Loading** - Some thumbnails have decoding issues
 
-## Getting Started
+### ❌ **Not Implemented**
+- **📹 Video Upload** - Recording and upload functionality
+- **💬 In-App Messaging** - Student-tutor communication
+- **📊 Analytics** - User and video analytics
+- **🏢 Admin Dashboard** - Content moderation and user management
+- **🌍 Internationalization** - Multi-language support
 
-### Prerequisites
+## 🛠️ Tech Stack
 
-- Flutter SDK (3.8.1 or higher)
-- Dart SDK
-- Android Studio / Xcode for mobile development
-- Supabase account
-- Agora.io account
-- Stripe account
+### **Frontend**
+- **Flutter 3.32.1** - Cross-platform UI framework
+- **Riverpod** - State management
+- **Google Fonts (Poppins)** - Typography
+- **TableCalendar** - Booking calendar widget
 
-### Installation
+### **Backend**
+- **Supabase** - PostgreSQL database, authentication, storage
+- **Agora.io** - Live streaming and video calls
+- **Stripe** - Payment processing
+- **Google Meet** - Session video calls
+
+### **Platforms**
+- **Web** ✅ - Chrome browser support
+- **Mobile** ⚠️ - iOS/Android (not tested)
+- **Desktop** ❌ - Not implemented
+
+## 🏗️ Project Structure
+
+```
+lib/
+├── config/           # Configuration files
+├── constants/        # App constants and themes
+├── models/           # Data models (User, Tutor, Video, etc.)
+├── providers/        # Riverpod state management
+├── screens/          # UI screens
+│   ├── auth/         # Authentication screens
+│   ├── booking/      # Booking flow screens
+│   ├── feed/         # Video feed screen
+│   ├── live/         # Live streaming screens
+│   └── tutor/        # Tutor onboarding screens
+├── services/         # Business logic services
+└── widgets/          # Reusable UI components
+```
+
+## 🚀 Getting Started
+
+### **Prerequisites**
+- Flutter 3.32.1 or higher
+- Dart 3.8.1 or higher
+- Chrome browser (for web testing)
+
+### **Installation**
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd tutorhouse_app
+   git clone https://github.com/fadinuxet/tutorhouse.git
+   cd tutorhouse
    ```
 
 2. **Install dependencies**
@@ -43,98 +96,140 @@ A TikTok-style mobile app for discovering tutors through vertical video feeds an
    flutter pub get
    ```
 
-3. **Configure environment variables**
-   
-   Update the configuration files with your API keys:
-   
-   - `lib/config/supabase_config.dart` - Add your Supabase URL and anon key
-   - `lib/config/agora_config.dart` - Add your Agora App ID
-   - `lib/config/stripe_config.dart` - Add your Stripe keys
+3. **Configure environment**
+   - Update `lib/config/supabase_config.dart` with your Supabase credentials
+   - Update `lib/config/agora_config.dart` with your Agora credentials
+   - Update `lib/config/stripe_config.dart` with your Stripe keys
 
-4. **Set up Supabase database**
-   
-   Run the SQL schema provided in the project documentation to create the required tables.
-
-5. **Run the app**
+4. **Run the app**
    ```bash
-   flutter run
+   flutter run -d chrome
    ```
 
-## Project Structure
+### **Database Setup**
 
-```
-lib/
-├── config/           # Configuration files
-├── models/           # Data models
-├── services/         # Business logic and API calls
-├── screens/          # UI screens
-│   ├── auth/         # Authentication screens
-│   ├── feed/         # Video feed screens
-│   ├── booking/      # Booking flow screens
-│   └── profile/      # Profile screens
-├── widgets/          # Reusable UI components
-└── utils/            # Utility functions
+Run the SQL schema in your Supabase dashboard:
+```sql
+-- See database_schema.sql for complete schema
 ```
 
-## Key Features Implementation
+## 📊 Current Status
 
-### Video Feed
-- Vertical scrolling with PageView
-- Auto-play/pause based on visibility
-- TikTok-style overlay UI
-- Infinite scroll with pagination
+### **Completion: ~75%**
 
-### Authentication
-- Email/password registration
-- Google Sign-In integration
-- User type selection (tutor/student/parent)
-- Tutor onboarding with video upload
+| Feature | Status | Priority |
+|---------|--------|----------|
+| Video Feed | ✅ Complete | High |
+| Authentication | ✅ Complete | High |
+| Booking System | ✅ Complete | High |
+| Tutor Profiles | ✅ Complete | High |
+| Live Streaming | ⚠️ Partial | Medium |
+| Mobile Support | ⚠️ Untested | Medium |
+| Video Upload | ❌ Missing | High |
+| Messaging | ❌ Missing | Medium |
+| Analytics | ❌ Missing | Low |
 
-### Booking System
-- Calendar integration
-- Time slot selection
-- Price calculation with platform fees
-- Stripe payment processing
+## 🎯 Sample Data
+
+The app includes 7 sample tutors:
+- **Sarah Johnson** - GCSE/A-Level Maths (4.8★)
+- **Dr. Michael Chen** - A-Level Physics (4.9★)
+- **Emma Williams** - GCSE/A-Level Chemistry (4.7★)
+- **James Thompson** - A-Level English (4.6★)
+- **Dr. Lisa Patel** - A-Level Biology (4.8★)
+- **Ahmed Al-Rashid** - GCSE Maths (Dubai) (4.7★)
+- **Priya Sharma** - A-Level Physics (Singapore) (4.9★)
+
+## 🔧 Development
+
+### **Running Tests**
+```bash
+flutter test
+```
+
+### **Code Analysis**
+```bash
+flutter analyze
+```
+
+### **Building for Web**
+```bash
+flutter build web
+```
+
+## 📝 Key Features Explained
+
+### **1. TikTok-Style Video Feed**
+- Vertical scrolling with `PageView.builder`
+- Swipe gestures for navigation
+- Mixed content (videos + live sessions)
+- Auto-play functionality
+
+### **2. Authentication System**
+- JWT token-based authentication
+- Persistent login with SharedPreferences
+- Guest browsing capability
+- Form validation with custom error messages
+
+### **3. Booking System**
+- Calendar integration with availability highlighting
+- Time slot selection with visual feedback
+- One trial per tutor limit
 - Google Meet link generation
 
-### Live Streaming
-- Agora RTC integration
-- Real-time viewer count
-- Chat functionality
-- Stream management
+### **4. State Management**
+- `AuthProvider` for authentication state
+- `TutorProvider` for tutor booking state
+- Riverpod for reactive state management
+- Cache management for performance
 
-## Development Status
+## 🐛 Known Issues
 
-- ✅ Project setup and dependencies
-- ✅ Authentication system
-- ✅ Video feed UI
-- ✅ Sample data service
-- ✅ Booking flow UI
-- 🔄 Live streaming integration
-- 🔄 Payment processing
-- 🔄 Tutor profiles
-- 🔄 Session management
+1. **Agora Compilation Errors** - Live streaming features have undefined classes
+2. **Image Loading** - Some video thumbnails fail to decode
+3. **Mobile Testing** - Not yet tested on iOS/Android devices
 
-## Sample Data
+## 🚀 Next Steps
 
-The app currently uses sample data for testing. To switch to real Supabase data:
+### **Priority 1: Fix Critical Issues**
+- [ ] Fix Agora compilation errors
+- [ ] Test mobile platform
+- [ ] Implement video upload system
 
-1. Set up your Supabase project
-2. Update `lib/services/feed_service.dart` and set `_useSampleData = false`
-3. Configure your Supabase credentials
+### **Priority 2: Core Features**
+- [ ] Add in-app messaging
+- [ ] Implement push notifications
+- [ ] Add video recording functionality
 
-## Contributing
+### **Priority 3: Polish**
+- [ ] Add analytics and monitoring
+- [ ] Implement admin dashboard
+- [ ] Add internationalization
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📞 Support
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+For support, email support@tutorhouse.co.uk or create an issue in this repository.
 
-## Support
+## 🙏 Acknowledgments
 
-For support, email support@tutorhouse.co.uk or join our Discord community.
+- Flutter team for the amazing framework
+- Supabase for the backend infrastructure
+- Agora.io for live streaming capabilities
+- Stripe for payment processing
+- All the open-source contributors
+
+---
+
+**Built with ❤️ for the future of education**
