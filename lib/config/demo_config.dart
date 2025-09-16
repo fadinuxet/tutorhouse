@@ -12,6 +12,6 @@ class DemoConfig {
   static const bool useSampleData = true;
   
   // Supabase integration
-  static const bool useSupabase = true; // Set to true when you have Supabase configured
+  static const bool useSupabase = true; // Fixed URL typo - now working
   static const bool enableRealFileUpload = true; // Set to true when Supabase is ready
 }

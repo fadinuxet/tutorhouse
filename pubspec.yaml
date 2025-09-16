@@ -43,6 +43,7 @@ dependencies:
   # Backend & Database
   supabase_flutter: ^2.3.4
   jwt_decoder: ^2.0.1
+  flutter_dotenv: ^5.1.0
   
   # Video & Streaming
   video_player: ^2.8.2
@@ -101,6 +102,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - .env
     - assets/images/
     - assets/icons/
 

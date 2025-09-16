@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Connection Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="result"></div>
+    
+    <script>
+        const { createClient } = supabase;
+        
+        // Your Supabase credentials
+        const supabaseUrl = 'https://tpjbzkwflyidjbmdrubg.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwamJ6a3dmbHlpZGpibWRydWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NzE5NzEsImV4cCI6MjA3MzQ0Nzk3MX0.7oZipOxgXpeD7FoXBT517giqfVr0akyKZdZyiQrsKdo';
+        
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                resultDiv.innerHTML = '<p>Testing Supabase connection...</p>';
+                
+                // Test basic connection
+                const { data, error } = await supabase.from('student_profiles').select('count').limit(1);
+                
+                if (error) {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                    resultDiv.innerHTML += `<p>Error code: ${error.code}</p>`;
+                    resultDiv.innerHTML += `<p>Error details: ${JSON.stringify(error, null, 2)}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: green;">✅ Connection successful!</p>`;
+                    resultDiv.innerHTML += `<p>Data: ${JSON.stringify(data, null, 2)}</p>`;
+                }
+                
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Exception: ${err.message}</p>`;
+                resultDiv.innerHTML += `<p>Full error: ${JSON.stringify(err, null, 2)}</p>`;
+            }
+        }
+        
+        // Run test when page loads
+        testConnection();
+    </script>
+</body>
+</html>

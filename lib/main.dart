@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'config/demo_config.dart';
 import 'config/supabase_config.dart';
 import 'config/agora_config.dart';
@@ -18,6 +19,9 @@ final tutorProvider = ChangeNotifierProvider<TutorProvider>((ref) => TutorProvid
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
   
   // Initialize the app
   await initializeApp();
@@ -37,11 +41,29 @@ Future<void> initializeApp() async {
     // Initialize Supabase if enabled
     if (DemoConfig.useSupabase) {
       print('🔧 Initializing Supabase...');
-      await Supabase.initialize(
-        url: SupabaseConfig.supabaseUrl,
-        anonKey: SupabaseConfig.supabaseAnonKey,
-      );
-      print('✅ Supabase initialized');
+      print('🔧 Supabase URL: ${SupabaseConfig.supabaseUrl}');
+      print('🔧 Supabase Anon Key: ${SupabaseConfig.supabaseAnonKey.substring(0, 20)}...');
+      
+      try {
+        await Supabase.initialize(
+          url: SupabaseConfig.supabaseUrl,
+          anonKey: SupabaseConfig.supabaseAnonKey,
+        );
+        print('✅ Supabase initialized successfully');
+        
+        // Test connection
+        final client = Supabase.instance.client;
+        print('🔧 Testing Supabase client...');
+        final response = await client.from('student_profiles').select('count').limit(1);
+        print('✅ Supabase database connection successful');
+        
+      } catch (e) {
+        print('❌ Supabase initialization failed: $e');
+        print('❌ Error type: ${e.runtimeType}');
+        if (e.toString().contains('404')) {
+          print('❌ 404 Error - Check your Supabase URL and project settings');
+        }
+      }
     }
     
     // Initialize Agora if configured
