@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "tutorhouse",
+    "storage_bucket": "tutorhouse.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
+        "android_client_info": {
+          "package_name": "com.example.tutorhouse_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "YOUR_OAUTH_CLIENT_ID_HERE",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tutorhouse_app",
+            "certificate_hash": "2A:8E:51:7E:6D:AC:04:25:F8:BD:1A:F7:31:F5:6E:DB:34:19:26:56"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "YOUR_GOOGLE_API_KEY_HERE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "YOUR_WEB_CLIENT_ID_HERE",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
