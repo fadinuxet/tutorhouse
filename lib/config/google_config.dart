@@ -1,8 +1,9 @@
 class GoogleConfig {
-  // Google API Keys
-  static const String googleApiKey = 'AIzaSyBACW3t4PVC-tQ4nlIuIm0hTF9cVA4PtZc';
-  static const String googleClientId = '830503792521-lp9348804farb99ba67fo265b21d2836.apps.googleusercontent.com';
-  static const String googleWebClientId = '830503792521-kpnnltqfoqlo3rg26iek5uqd9v5m5mfb.apps.googleusercontent.com';
+  // ⚠️ SECURITY WARNING: Replace with your actual Google API credentials
+  // These are DEMO credentials - DO NOT use in production!
+  static const String googleApiKey = 'YOUR_GOOGLE_API_KEY_HERE';
+  static const String googleClientId = 'YOUR_GOOGLE_CLIENT_ID_HERE';
+  static const String googleWebClientId = 'YOUR_GOOGLE_WEB_CLIENT_ID_HERE';
   
   // Google Meet Configuration
   static const String googleMeetApiKey = 'YOUR_GOOGLE_MEET_API_KEY_HERE';

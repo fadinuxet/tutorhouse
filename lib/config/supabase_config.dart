@@ -1,7 +1,8 @@
 class SupabaseConfig {
-  // TODO: Replace with your actual Supabase project details
-  static const String supabaseUrl = 'https://lpjbzkwflyidjbmdrubg.supabase.co';
-  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwamJ6a3dmbHlpZGpibWRydWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NzE5NzEsImV4cCI6MjA3MzQ0Nzk3MX0.7oZipOxgXpeD7FoXBT517giqfVr0akyKZdZyiQrsKdo';
+  // ⚠️ SECURITY WARNING: Replace with your actual Supabase project details
+  // These are DEMO credentials - DO NOT use in production!
+  static const String supabaseUrl = 'YOUR_SUPABASE_URL_HERE';
+  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY_HERE';
   
   // Storage bucket names
   static const String tutorVideosBucket = 'tutor-videos';
