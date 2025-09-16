@@ -1,8 +1,8 @@
 class SupabaseConfig {
-  // ⚠️ SECURITY WARNING: Replace with your actual Supabase project details
-  // These are DEMO credentials - DO NOT use in production!
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL_HERE';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY_HERE';
+  // ✅ Using environment variables for security
+  // Real credentials are stored in .env file (not committed to Git)
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: 'YOUR_SUPABASE_URL_HERE');
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'YOUR_SUPABASE_ANON_KEY_HERE');
   
   // Storage bucket names
   static const String tutorVideosBucket = 'tutor-videos';

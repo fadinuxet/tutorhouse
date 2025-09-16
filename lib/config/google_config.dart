@@ -1,9 +1,9 @@
 class GoogleConfig {
-  // ⚠️ SECURITY WARNING: Replace with your actual Google API credentials
-  // These are DEMO credentials - DO NOT use in production!
-  static const String googleApiKey = 'YOUR_GOOGLE_API_KEY_HERE';
-  static const String googleClientId = 'YOUR_GOOGLE_CLIENT_ID_HERE';
-  static const String googleWebClientId = 'YOUR_GOOGLE_WEB_CLIENT_ID_HERE';
+  // ✅ Using environment variables for security
+  // Real credentials are stored in .env file (not committed to Git)
+  static const String googleApiKey = String.fromEnvironment('GOOGLE_API_KEY', defaultValue: 'YOUR_GOOGLE_API_KEY_HERE');
+  static const String googleClientId = String.fromEnvironment('GOOGLE_CLIENT_ID', defaultValue: 'YOUR_GOOGLE_CLIENT_ID_HERE');
+  static const String googleWebClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: 'YOUR_GOOGLE_WEB_CLIENT_ID_HERE');
   
   // Google Meet Configuration
   static const String googleMeetApiKey = 'YOUR_GOOGLE_MEET_API_KEY_HERE';
