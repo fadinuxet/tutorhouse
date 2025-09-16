@@ -1,7 +1,8 @@
 class AgoraConfig {
-  // TODO: Replace with your actual Agora App ID
-  // Get your App ID from: https://console.agora.io
-  static const String appId = '31ab20b72ffb4452adeb97201bd8daa3';
+  // ✅ Using build-time environment variables for security
+  // Real credentials are passed via --dart-define flags when running the app
+  static const String appId = String.fromEnvironment('AGORA_APP_ID', defaultValue: 'YOUR_AGORA_APP_ID_HERE');
+  static const String appCertificate = String.fromEnvironment('AGORA_APP_CERTIFICATE', defaultValue: 'YOUR_AGORA_APP_CERTIFICATE_HERE');
   static const String token = ''; // Will be generated server-side
   
   // Agora channel configuration
@@ -19,7 +20,7 @@ class AgoraConfig {
   static const int channels = 1;
   
   // Check if Agora is configured
-  static bool get isConfigured => appId != 'YOUR_AGORA_APP_ID';
+  static bool get isConfigured => appId != 'YOUR_AGORA_APP_ID_HERE';
   
   // Get channel name for tutor
   static String getChannelName(String tutorId) => 'tutor_$tutorId';

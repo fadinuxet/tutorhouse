@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import '../models/live_session.dart';
 import '../models/user.dart' as app_user;
+import '../config/agora_config.dart';
 
 // Conditional imports for web compatibility
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -49,8 +50,8 @@ class AgoraLiveService {
     }
 
     _engine = createAgoraRtcEngine();
-    await _engine!.initialize(const RtcEngineContext(
-      appId: '31ab20b72ffb4452adeb97201bd8daa3', // Your Agora App ID
+    await _engine!.initialize(RtcEngineContext(
+      appId: AgoraConfig.appId,
     ));
 
     // Set up event handlers
