@@ -1,10 +1,8 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class SupabaseConfig {
-  // ✅ Using environment variables for security
-  // Real credentials are loaded from .env file
-  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? 'YOUR_SUPABASE_URL_HERE';
-  static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? 'YOUR_SUPABASE_ANON_KEY_HERE';
+  // ✅ Using build-time environment variables for security
+  // Real credentials are passed via --dart-define flags when running the app
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: 'YOUR_SUPABASE_URL_HERE');
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'YOUR_SUPABASE_ANON_KEY_HERE');
   
   // Storage bucket names
   static const String tutorVideosBucket = 'tutor-videos';

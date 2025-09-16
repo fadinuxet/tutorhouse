@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'config/demo_config.dart';
 import 'config/supabase_config.dart';
 import 'config/agora_config.dart';
@@ -19,9 +18,6 @@ final tutorProvider = ChangeNotifierProvider<TutorProvider>((ref) => TutorProvid
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
   
   // Initialize the app
   await initializeApp();
