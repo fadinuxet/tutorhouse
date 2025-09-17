@@ -1,7 +1,7 @@
 class AgoraConfig {
   // ✅ Using build-time environment variables for security
   // Real credentials are passed via --dart-define flags when running the app
-  static const String appId = String.fromEnvironment('AGORA_APP_ID', defaultValue: 'YOUR_AGORA_APP_ID_HERE');
+  static const String appId = String.fromEnvironment('AGORA_APP_ID', defaultValue: 'demo_app_id_for_testing');
   static const String appCertificate = String.fromEnvironment('AGORA_APP_CERTIFICATE', defaultValue: 'YOUR_AGORA_APP_CERTIFICATE_HERE');
   static const String token = ''; // Will be generated server-side
   
