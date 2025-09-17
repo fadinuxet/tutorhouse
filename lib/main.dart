@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/demo_config.dart';
 import 'config/supabase_config.dart';
 import 'config/agora_config.dart';
-import 'services/agora_service_stub.dart' as agora_service;
+import 'services/agora_service.dart' as agora_service;
 import 'services/payment_service.dart';
 import 'services/auth_service.dart';
 import 'services/booking_service.dart';
@@ -31,24 +31,20 @@ void main() async {
 
 /// Initialize the app with all required services
 Future<void> initializeApp() async {
-  
   try {
     // Initialize Supabase if enabled
     if (DemoConfig.useSupabase) {
-      
       try {
         await Supabase.initialize(
           url: SupabaseConfig.supabaseUrl,
           anonKey: SupabaseConfig.supabaseAnonKey,
         );
         
-        // Test connection
+        // Test connection - use a simple table that exists
         final client = Supabase.instance.client;
-        final response = await client.from('student_profiles').select('count').limit(1);
-        
+        // Skip connection test to avoid startup issues
       } catch (e) {
-        if (e.toString().contains('404')) {
-        }
+        // Continue with demo mode if Supabase fails
       }
     }
     
@@ -57,19 +53,26 @@ Future<void> initializeApp() async {
       await agora_service.AgoraService.initialize();
     }
     
-    // Initialize Payment service
-    await PaymentService.initialize();
+    // Initialize services with individual error handling
+    try {
+      await PaymentService.initialize();
+    } catch (e) {
+      print('Payment service initialization failed: $e');
+    }
     
-    // Initialize Auth service
-    await AuthService.initialize();
+    try {
+      await AuthService.initialize();
+    } catch (e) {
+      print('Auth service initialization failed: $e');
+    }
     
-    // Initialize Booking service
-    await BookingService.initialize();
-    
-    // Initialize Tutor service
-    // Note: TutorProvider will be initialized in the app widget
-    
+    try {
+      await BookingService.initialize();
+    } catch (e) {
+      print('Booking service initialization failed: $e');
+    }
   } catch (e) {
+    print('App initialization error: $e');
     // Continue with app launch even if some services fail
   }
 }

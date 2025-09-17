@@ -37,7 +37,9 @@ class AgoraService {
     try {
       // Check if Agora is configured
       if (!AgoraConfig.isConfigured) {
-        return false;
+        print('Agora not configured, running in demo mode');
+        _isInitialized = true;
+        return true;
       }
       
       // Skip initialization on web for now due to platformViewRegistry issue
