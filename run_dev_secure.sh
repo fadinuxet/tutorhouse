@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Secure build script with environment variables
-# This script loads credentials from .env file and passes them securely
+# Secure development script with environment variables
+# This script loads credentials from .env file for development
 
-echo "🔒 Building TutorHouse app with secure credentials..."
+echo "🔒 Running TutorHouse app in development mode with secure credentials..."
 
 # Check if .env file exists
 if [ ! -f .env ]; then
@@ -25,12 +25,9 @@ fi
 
 echo "✅ Environment variables loaded successfully"
 
-# Build the app with secure credentials
-echo "🏗️ Building Flutter app..."
-flutter build apk --release \
+# Run the app with secure credentials
+echo "🚀 Starting Flutter app..."
+flutter run \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
   --target=lib/main.dart
-
-echo "✅ Build completed! APK location:"
-echo "📱 build/app/outputs/flutter-apk/app-release.apk"
