@@ -68,6 +68,8 @@ class LiveSession {
   bool get isEnded => status == LiveSessionStatus.ended;
   bool get isCancelled => status == LiveSessionStatus.cancelled;
   
+  String get tutorName => tutor.fullName;
+  
   bool get isFree => type == LiveSessionType.discovery;
   bool get isPaid => price != null && price! > 0;
   

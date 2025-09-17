@@ -83,9 +83,9 @@ class _FeedOverlayWidgetState extends State<FeedOverlayWidget> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.3),
+                  Colors.black.withValues(alpha: 0.3),
                   Colors.transparent,
-                  Colors.black.withOpacity(0.7),
+                  Colors.black.withValues(alpha: 0.7),
                 ],
                 stops: const [0.0, 0.3, 1.0],
               ),
@@ -170,7 +170,7 @@ class _FeedOverlayWidgetState extends State<FeedOverlayWidget> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppConstants.primaryColor.withOpacity(0.2),
+                              color: AppConstants.primaryColor.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -238,10 +238,10 @@ class _FeedOverlayWidgetState extends State<FeedOverlayWidget> {
                       ? Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
+                            color: Colors.orange.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.orange.withOpacity(0.3),
+                              color: Colors.orange.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Column(
@@ -332,7 +332,7 @@ class _ActionButton extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(

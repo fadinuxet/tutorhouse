@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'config/constants.dart';
-import 'config/demo_config.dart';
 import 'screens/auth/mobile_auth_screen.dart';
 import 'screens/feed/video_feed_screen.dart';
 import 'providers/auth_provider.dart';
-import 'providers/tutor_provider.dart';
 import 'main.dart';
 
 class TutorhouseApp extends ConsumerStatefulWidget {
@@ -28,13 +25,7 @@ class _TutorhouseAppState extends ConsumerState<TutorhouseApp> {
 
   Future<void> _initializeAuth() async {
     try {
-      print('🚀 TutorhouseApp: Initializing auth...');
       await ref.read(authProvider).initialize();
-      print('✅ TutorhouseApp: Auth initialized');
-      
-      print('🚀 TutorhouseApp: Initializing tutors...');
-      await ref.read(tutorProvider).initialize();
-      print('✅ TutorhouseApp: Tutors initialized');
     } catch (e) {
       print('❌ TutorhouseApp: Error initializing services: $e');
     } finally {
@@ -173,8 +164,7 @@ class _TutorhouseAppState extends ConsumerState<TutorhouseApp> {
       );
     }
 
-    // Show video feed (guest browsing is allowed)
-    // Users can sign in from the video feed
+    // Always show video feed first - users can sign in optionally
     return const VideoFeedScreen();
   }
 }

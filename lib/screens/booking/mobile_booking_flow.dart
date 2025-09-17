@@ -100,7 +100,7 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppConstants.textSecondary.withOpacity(0.3),
+              color: AppConstants.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -189,12 +189,12 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                           shape: BoxShape.circle,
                         ),
                         todayDecoration: BoxDecoration(
-                          color: AppConstants.primaryColor.withOpacity(0.3),
+                          color: AppConstants.primaryColor.withValues(alpha: 0.3),
                           shape: BoxShape.circle,
                         ),
                         markersMaxCount: 1,
                         markerDecoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.6),
+                          color: Colors.green.withValues(alpha: 0.6),
                           shape: BoxShape.circle,
                         ),
                         markerMargin: const EdgeInsets.symmetric(horizontal: 1),
@@ -209,10 +209,10 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                             return Container(
                               margin: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.08),
+                                color: Colors.green.withValues(alpha: 0.08),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.green.withOpacity(0.25),
+                                  color: Colors.green.withValues(alpha: 0.25),
                                   width: 0.8,
                                 ),
                               ),
@@ -266,10 +266,10 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                       margin: const EdgeInsets.only(top: 12),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.orange.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.orange.withOpacity(0.3),
+                          color: Colors.orange.withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
@@ -342,10 +342,10 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceColor.withOpacity(0.5),
+        color: AppConstants.surfaceColor.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppConstants.textSecondary.withOpacity(0.3),
+          color: AppConstants.textSecondary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -359,10 +359,10 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: Colors.green.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.6),
+                    color: Colors.green.withValues(alpha: 0.6),
                     width: 1,
                   ),
                 ),
@@ -385,7 +385,7 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -493,24 +493,24 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                   decoration: BoxDecoration(
                     color: isSelected 
                         ? AppConstants.primaryColor 
-                        : AppConstants.backgroundColor.withOpacity(0.05),
+                        : AppConstants.backgroundColor.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(
                       color: isSelected 
                           ? AppConstants.primaryColor 
-                          : AppConstants.textSecondary.withOpacity(0.2),
+                          : AppConstants.textSecondary.withValues(alpha: 0.2),
                       width: isSelected ? 3 : 1.5,
                     ),
                     boxShadow: isSelected ? [
                       BoxShadow(
-                        color: AppConstants.primaryColor.withOpacity(0.4),
+                        color: AppConstants.primaryColor.withValues(alpha: 0.4),
                         blurRadius: 12,
                         spreadRadius: 1,
                         offset: const Offset(0, 3),
                       ),
                     ] : [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),

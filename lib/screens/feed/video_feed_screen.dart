@@ -43,6 +43,14 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
     WidgetsBinding.instance.addObserver(this);
     _currentIndex = widget.initialIndex ?? 0;
     _pageController = PageController(initialPage: _currentIndex);
+    
+    // Refresh auth state to ensure it's up to date
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(authProvider).refreshAuthState();
+      }
+    });
+    
     _loadVideos();
   }
   
@@ -204,7 +212,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
+                color: AppConstants.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text(
@@ -447,143 +455,11 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                         ],
                       );
                     } else if (content is LiveSession) {
-                      return Stack(
-                        children: [
-                          // Live Session Display
-                          LiveSessionWidget(
-                            session: content,
-                            onJoin: () => _raiseHand(content.id),
-                            onFollow: () => _followTutor(content.tutorId),
-                            onShare: () => _shareLiveSession(content),
-                          ),
-                          
-                          // Live Session Overlay - Simple version for live sessions
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.7),
-                                  ],
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Left side - Tutor info
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          content.tutor.fullName,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          content.subject,
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${content.currentParticipants} viewers',
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  
-                                  // Right side - Action buttons
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Raise Hand button
-                                      if (AuthService.isAuthenticated)
-                                        MouseRegion(
-                                          cursor: SystemMouseCursors.click,
-                                          child: GestureDetector(
-                                            onTap: () => _raiseHand(content.id),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: AppConstants.primaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.pan_tool,
-                                                color: Colors.white,
-                                                size: 24,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      const SizedBox(height: 12),
-                                      
-                                      // Follow button
-                                      MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: GestureDetector(
-                                          onTap: () => _followTutor(content.tutorId),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.person_add,
-                                              color: Colors.white,
-                                              size: 24,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      
-                                      // Share button
-                                      MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: GestureDetector(
-                                          onTap: () => _shareLiveSession(content),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.share,
-                                              color: Colors.white,
-                                              size: 24,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                      return LiveSessionWidget(
+                        session: content,
+                        onJoin: () => _raiseHand(content.id),
+                        onFollow: () => _followTutor(content.tutorId),
+                        onShare: () => _shareLiveSession(content),
                       );
                     } else {
                       return const Center(
@@ -621,7 +497,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
             left: 0,
             right: 0,
             child: Container(
-              color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -660,7 +536,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                                     color: AppConstants.surfaceColor,
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                      color: AppConstants.primaryColor.withOpacity(0.3),
+                                      color: AppConstants.primaryColor.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Row(
@@ -876,7 +752,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
             left: 0,
             right: 0,
             child: Container(
-              color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -915,7 +791,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                                     color: AppConstants.surfaceColor,
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                      color: AppConstants.primaryColor.withOpacity(0.3),
+                                      color: AppConstants.primaryColor.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Row(

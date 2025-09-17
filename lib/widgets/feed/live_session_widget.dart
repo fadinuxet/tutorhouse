@@ -5,6 +5,7 @@ import '../../services/auth_service.dart';
 import '../../services/feed_content_service.dart';
 import '../../widgets/common/custom_popup.dart';
 import '../../screens/auth/mobile_auth_screen.dart';
+import '../../screens/live/live_viewer_screen.dart';
 
 class LiveSessionWidget extends StatefulWidget {
   final LiveSession session;
@@ -25,7 +26,6 @@ class LiveSessionWidget extends StatefulWidget {
 }
 
 class _LiveSessionWidgetState extends State<LiveSessionWidget> {
-  bool _isHandRaised = false;
   bool _isJoining = false;
 
   @override
@@ -51,8 +51,8 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.3),
-                  Colors.black.withOpacity(0.7),
+                  Colors.black.withValues(alpha: 0.3),
+                  Colors.black.withValues(alpha: 0.7),
                 ],
               ),
             ),
@@ -102,7 +102,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -216,7 +216,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.2),
+                            color: Colors.red.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.red, width: 1),
                           ),
@@ -234,7 +234,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.2),
+                            color: Colors.blue.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.blue, width: 1),
                           ),
@@ -253,7 +253,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -271,7 +271,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.2),
+                            color: Colors.green.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.green, width: 1),
                           ),
@@ -293,15 +293,13 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                   // Action buttons
                   Row(
                     children: [
-                      // Join/Raise Hand button - only show for authenticated users
+                      // Join Live button - only show for authenticated users
                       if (AuthService.isAuthenticated) ...[
                         Expanded(
                           child: ElevatedButton(
                             onPressed: _isJoining ? null : _handleJoinSession,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: widget.session.isLive 
-                                  ? (_isHandRaised ? Colors.orange : AppConstants.primaryColor)
-                                  : Colors.blue,
+                              backgroundColor: AppConstants.primaryColor,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -317,9 +315,9 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   )
-                                : Text(
-                                    _getJoinButtonText(),
-                                    style: const TextStyle(
+                                : const Text(
+                                    'Join Live',
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -369,7 +367,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                             size: 24,
                           ),
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.2),
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
                             shape: const CircleBorder(),
                           ),
                         ),
@@ -383,7 +381,7 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
                           size: 24,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
                           shape: const CircleBorder(),
                         ),
                       ),
@@ -398,15 +396,6 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
     );
   }
 
-  String _getJoinButtonText() {
-    if (widget.session.isLive) {
-      return _isHandRaised ? 'Hand Raised' : 'Raise Hand';
-    } else if (widget.session.isScheduled) {
-      return 'Join When Live';
-    } else {
-      return 'View Details';
-    }
-  }
 
   String _formatTime(DateTime dateTime) {
     final now = DateTime.now();
@@ -424,46 +413,53 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
   }
 
   Future<void> _handleJoinSession() async {
+    print('🔍 _handleJoinSession called - BUTTON WAS CLICKED!');
+    print('🔍 AuthService.isAuthenticated: ${AuthService.isAuthenticated}');
+    print('🔍 widget.session.isLive: ${widget.session.isLive}');
+    print('🔍 _isJoining: $_isJoining');
+    
     if (!AuthService.isAuthenticated) {
+      print('❌ User not authenticated, showing sign in dialog');
       _showSignInRequiredDialog();
       return;
     }
 
+    print('✅ User authenticated, setting _isJoining to true');
     setState(() {
       _isJoining = true;
     });
 
     try {
       if (widget.session.isLive) {
-        if (_isHandRaised) {
-          // Lower hand
-          await FeedContentService.lowerHand(widget.session.id, AuthService.currentUser!.id);
-          setState(() {
-            _isHandRaised = false;
-          });
-          _showSuccessMessage('Hand lowered');
-        } else {
-          // Raise hand
-          await FeedContentService.raiseHand(
-            widget.session.id,
-            AuthService.currentUser!.id,
-            AuthService.currentUser!.fullName,
-          );
-          setState(() {
-            _isHandRaised = true;
-          });
-          _showSuccessMessage('Hand raised! Waiting for approval...');
-        }
+        // Navigate to live session
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LiveViewerScreen(
+              sessionId: widget.session.id,
+              tutorName: widget.session.tutorName,
+            ),
+          ),
+        );
+        // Reset joining state immediately after navigation
+        setState(() {
+          _isJoining = false;
+        });
       } else if (widget.session.isScheduled) {
         // Join when live
         _showInfoMessage('Session will start ${_formatTime(widget.session.scheduledAt)}');
+        setState(() {
+          _isJoining = false;
+        });
       } else {
         // View details
         _showInfoMessage('Session details: ${widget.session.title}');
+        setState(() {
+          _isJoining = false;
+        });
       }
     } catch (e) {
       _showErrorMessage('Failed to join session: $e');
-    } finally {
       setState(() {
         _isJoining = false;
       });

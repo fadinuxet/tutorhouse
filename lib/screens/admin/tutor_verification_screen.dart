@@ -119,7 +119,7 @@ class _TutorVerificationScreenState extends State<TutorVerificationScreen> {
                         border: Border.all(
                           color: isSelected 
                             ? AppConstants.primaryColor 
-                            : AppConstants.textSecondary.withOpacity(0.3),
+                            : AppConstants.textSecondary.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -215,10 +215,10 @@ class _TutorVerificationScreenState extends State<TutorVerificationScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isPending 
-            ? Colors.orange.withOpacity(0.3)
+            ? Colors.orange.withValues(alpha: 0.3)
             : isVerified 
-              ? Colors.green.withOpacity(0.3)
-              : Colors.red.withOpacity(0.3),
+              ? Colors.green.withValues(alpha: 0.3)
+              : Colors.red.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -308,10 +308,10 @@ class _TutorVerificationScreenState extends State<TutorVerificationScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isPending 
-                    ? Colors.orange.withOpacity(0.2)
+                    ? Colors.orange.withValues(alpha: 0.2)
                     : isVerified 
-                      ? Colors.green.withOpacity(0.2)
-                      : Colors.red.withOpacity(0.2),
+                      ? Colors.green.withValues(alpha: 0.2)
+                      : Colors.red.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

@@ -122,7 +122,7 @@ class _GroupLiveSessionScreenState extends State<GroupLiveSessionScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.7),
+                    Colors.black.withValues(alpha: 0.7),
                     Colors.transparent,
                   ],
                 ),
@@ -135,7 +135,7 @@ class _GroupLiveSessionScreenState extends State<GroupLiveSessionScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
@@ -215,7 +215,7 @@ class _GroupLiveSessionScreenState extends State<GroupLiveSessionScreen> {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withOpacity(0.9),
+                    Colors.black.withValues(alpha: 0.9),
                     Colors.transparent,
                   ],
                 ),
@@ -272,7 +272,7 @@ class _GroupLiveSessionScreenState extends State<GroupLiveSessionScreen> {
                           margin: const EdgeInsets.only(bottom: 8),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -298,9 +298,9 @@ class _GroupLiveSessionScreenState extends State<GroupLiveSessionScreen> {
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               hintText: 'Ask a question...',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.1),
+                              fillColor: Colors.white.withValues(alpha: 0.1),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(25),
                                 borderSide: BorderSide.none,
@@ -397,7 +397,7 @@ class _GroupLiveSessionScreenState extends State<GroupLiveSessionScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.black.withOpacity(0.5),
+          color: backgroundColor ?? Colors.black.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(25),
         ),
         child: Icon(

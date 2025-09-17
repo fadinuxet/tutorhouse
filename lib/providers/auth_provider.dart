@@ -20,7 +20,9 @@ class AuthProvider extends ChangeNotifier {
   // Check if token is valid (not expired)
   bool _isTokenValid() {
     if (_authToken == null || _tokenExpiry == null) return false;
-    return DateTime.now().isBefore(_tokenExpiry!);
+    // Add 1 hour buffer to prevent edge cases (same as AuthService)
+    final bufferTime = _tokenExpiry!.subtract(const Duration(hours: 1));
+    return DateTime.now().isBefore(bufferTime);
   }
 
   // Initialize auth state from storage
@@ -41,6 +43,10 @@ class AuthProvider extends ChangeNotifier {
       print('✅ AuthProvider initialized - isAuthenticated: $isAuthenticated');
       print('✅ User: ${_user?.email}');
       print('✅ Token expires: $_tokenExpiry');
+      print('✅ AuthService.isAuthenticated: ${AuthService.isAuthenticated}');
+      print('✅ AuthService.currentUser: ${AuthService.currentUser?.email}');
+      print('✅ AuthService.authToken: ${AuthService.authToken?.substring(0, 20)}...');
+      print('✅ AuthService.tokenExpiry: ${AuthService.tokenExpiry}');
       
     } catch (e) {
       print('❌ Error initializing AuthProvider: $e');
@@ -228,5 +234,21 @@ class AuthProvider extends ChangeNotifier {
   // Clear error manually
   void clearError() {
     _clearError();
+  }
+  
+  // Force refresh auth state from AuthService
+  Future<void> refreshAuthState() async {
+    print('🔄 AuthProvider.refreshAuthState called');
+    
+    // Reload from AuthService
+    _user = AuthService.currentUser;
+    _authToken = AuthService.authToken;
+    _tokenExpiry = AuthService.tokenExpiry;
+    
+    print('🔄 Auth state refreshed - isAuthenticated: $isAuthenticated');
+    print('🔄 User: ${_user?.email}');
+    print('🔄 Token expires: $_tokenExpiry');
+    
+    notifyListeners();
   }
 }

@@ -110,8 +110,8 @@ class FeedOverlayWidget extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.7),
-                  Colors.black.withOpacity(0.9),
+                  Colors.black.withValues(alpha: 0.7),
+                  Colors.black.withValues(alpha: 0.9),
                 ],
               ),
             ),
@@ -198,7 +198,7 @@ class FeedOverlayWidget extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppConstants.primaryColor.withOpacity(0.2),
+                              color: AppConstants.primaryColor.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: AppConstants.primaryColor),
                             ),
@@ -469,7 +469,7 @@ class FeedOverlayWidget extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.7),
+                    Colors.black.withValues(alpha: 0.7),
                     Colors.transparent,
                   ],
                 ),
@@ -533,6 +533,8 @@ class FeedOverlayWidget extends StatelessWidget {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => LiveViewerScreen(
+            sessionId: 'live_${tutor.id}',
+            tutorName: tutor.fullName,
             video: video,
             tutor: tutor,
           ),
@@ -581,7 +583,7 @@ class _ActionButton extends StatelessWidget {
           Container(
             padding: isCircular ? EdgeInsets.zero : const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isCircular ? Colors.transparent : Colors.black.withOpacity(0.6),
+              color: isCircular ? Colors.transparent : Colors.black.withValues(alpha: 0.6),
               shape: isCircular ? BoxShape.circle : BoxShape.circle,
             ),
             child: child ?? Icon(

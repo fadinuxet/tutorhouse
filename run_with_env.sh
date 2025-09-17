@@ -20,3 +20,4 @@ echo "🚀 Starting Flutter app..."
 
 # Run Flutter with environment variables
 flutter run -d chrome --dart-define-from-file=.env
+

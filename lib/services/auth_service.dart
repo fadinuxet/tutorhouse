@@ -4,7 +4,6 @@ import 'supabase_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:html' as html;
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthService {
   // Demo mode - no real authentication
@@ -24,7 +23,9 @@ class AuthService {
   // Check if token is valid (not expired)
   static bool _isTokenValid() {
     if (_authToken == null || _tokenExpiry == null) return false;
-    return DateTime.now().isBefore(_tokenExpiry!);
+    // Add 1 hour buffer to prevent edge cases
+    final bufferTime = _tokenExpiry!.subtract(const Duration(hours: 1));
+    return DateTime.now().isBefore(bufferTime);
   }
   
   // Generate a demo JWT token (in production, this would come from your backend)
@@ -54,7 +55,10 @@ class AuthService {
     print('🚀 AuthService.initialize() called');
     
     try {
+      // Load existing user data from storage for persistent login
       await _loadUserFromStorage();
+      print('💾 Loaded user data from storage');
+      
       _isInitialized = true;
       print('✅ AuthService initialized successfully - isAuthenticated: $isAuthenticated');
     } catch (e) {
@@ -186,6 +190,11 @@ class AuthService {
           print('✅ User and valid token loaded from storage: ${_currentUser?.email}');
           print('✅ Token expires at: $_tokenExpiry');
           print('✅ AuthService.isAuthenticated: $isAuthenticated');
+          
+          // Generate a new token to extend the session
+          _authToken = _generateDemoToken();
+          _tokenExpiry = DateTime.now().add(const Duration(hours: 24));
+          print('🔄 Generated new token for extended session');
         }
       } else {
         print('❌ No user data found in any storage');

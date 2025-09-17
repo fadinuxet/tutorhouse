@@ -39,6 +39,12 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
   void initState() {
     super.initState();
     _isSignUp = widget.showSignUp;
+    
+    // Clear any pre-filled data to prevent wrong email issues
+    _emailController.clear();
+    _passwordController.clear();
+    _nameController.clear();
+    
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -190,7 +196,7 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
         color: AppConstants.surfaceColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppConstants.primaryColor.withOpacity(0.2),
+          color: AppConstants.primaryColor.withValues(alpha: 0.2),
         ),
       ),
       child: Form(
@@ -463,13 +469,13 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
           color: isSelected 
-              ? AppConstants.primaryColor.withOpacity(0.2)
+              ? AppConstants.primaryColor.withValues(alpha: 0.2)
               : AppConstants.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected 
                 ? AppConstants.primaryColor
-                : AppConstants.textSecondary.withOpacity(0.3),
+                : AppConstants.textSecondary.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -586,7 +592,7 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
     return Text(
       'By continuing, you agree to our Terms of Service and Privacy Policy',
       style: TextStyle(
-        color: AppConstants.textSecondary.withOpacity(0.7),
+        color: AppConstants.textSecondary.withValues(alpha: 0.7),
         fontSize: 12,
       ),
       textAlign: TextAlign.center,
@@ -737,7 +743,7 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
+                color: AppConstants.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text(

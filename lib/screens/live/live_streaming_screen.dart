@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/constants.dart';
 import '../../services/agora_service_stub.dart' as agora_service;
-import '../../services/agora_live_service.dart';
+import '../../services/agora_live_service_simple.dart';
 import '../../models/tutor_profile.dart';
 import '../../models/live_session.dart';
 import '../../models/user.dart' as app_user;
@@ -111,7 +111,7 @@ class _LiveStreamingScreenState extends State<LiveStreamingScreen> {
       _status = 'Starting stream...';
     });
 
-    final channelName = AgoraConfig.getChannelName(widget.tutor.id);
+    final channelName = 'live_${widget.tutor.id}';
     final success = await agora_service.AgoraService.joinChannelAsBroadcaster(channelName);
     
     if (success) {
@@ -210,7 +210,7 @@ class _LiveStreamingScreenState extends State<LiveStreamingScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                       Colors.transparent,
                     ],
                   ),
@@ -272,7 +272,7 @@ class _LiveStreamingScreenState extends State<LiveStreamingScreen> {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withOpacity(0.8),
+                    Colors.black.withValues(alpha: 0.8),
                     Colors.transparent,
                   ],
                 ),
@@ -424,7 +424,7 @@ class _LiveStreamingScreenState extends State<LiveStreamingScreen> {
               bottom: 0,
               child: Container(
                 width: 300,
-                color: Colors.black.withOpacity(0.9),
+                color: Colors.black.withValues(alpha: 0.9),
                 child: Column(
                   children: [
                     // Header
@@ -577,13 +577,23 @@ class _LiveStreamingScreenState extends State<LiveStreamingScreen> {
   }
 
   Future<void> _approveSpeaker(RaisedHand hand) async {
-    await _liveService.approveSpeaker(hand.userId, hand.userName);
+    // Create a demo user object
+    final user = app_user.User(
+      id: hand.userId,
+      email: 'demo@tutorhouse.com',
+      fullName: hand.userName,
+      userType: app_user.UserType.student,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    
+    await _liveService.approveSpeaker(user);
     
     // Remove from raised hands list
     setState(() {
       _raisedHands.removeWhere((h) => h.userId == hand.userId);
     });
-
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${hand.userName} can now speak'),
@@ -609,10 +619,58 @@ class _LiveStreamingScreenState extends State<LiveStreamingScreen> {
 
   Future<void> _muteCurrentSpeaker() async {
     if (_currentSpeaker != null) {
-      await _liveService.muteSpeaker(_currentSpeaker!, 'Current Speaker');
+      // Create a demo user object
+      final user = app_user.User(
+        id: _currentSpeaker!,
+        email: 'demo@tutorhouse.com',
+        fullName: 'Current Speaker',
+        userType: app_user.UserType.student,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      await _liveService.muteSpeaker(user, 'Current Speaker');
       setState(() {
         _currentSpeaker = null;
       });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Speaker muted'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 1),
+        ),
+      );
     }
+  }
+  
+  // Stop current speaker (tutor takes over)
+  Future<void> _stopCurrentSpeaker() async {
+    if (_currentSpeaker != null) {
+      // For demo purposes, simulate stopping speaker
+      setState(() {
+        _currentSpeaker = null;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Speaker stopped - tutor has control'),
+          backgroundColor: Colors.blue,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+  
+  // Set speaking time limit for all speakers
+  void _setSpeakingTimeLimit(int minutes) {
+    // This would be sent to all participants
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Speaking time limit set to $minutes minutes'),
+        backgroundColor: Colors.blue,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }

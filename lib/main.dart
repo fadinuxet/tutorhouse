@@ -39,6 +39,8 @@ Future<void> initializeApp() async {
       print('🔧 Initializing Supabase...');
       print('🔧 Supabase URL: ${SupabaseConfig.supabaseUrl}');
       print('🔧 Supabase Anon Key: ${SupabaseConfig.supabaseAnonKey.substring(0, 20)}...');
+      print('🔧 Full Supabase URL: ${SupabaseConfig.supabaseUrl}');
+      print('🔧 Full Supabase Key: ${SupabaseConfig.supabaseAnonKey}');
       
       try {
         await Supabase.initialize(

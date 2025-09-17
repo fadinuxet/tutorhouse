@@ -25,3 +25,4 @@ flutter run -d chrome \
   --dart-define=GOOGLE_API_KEY="$GOOGLE_API_KEY" \
   --dart-define=GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
   --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID"
+

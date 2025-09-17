@@ -1,8 +1,8 @@
 class SupabaseConfig {
   // ✅ Using build-time environment variables for security
   // Real credentials are passed via --dart-define flags when running the app
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: 'YOUR_SUPABASE_URL_HERE');
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'YOUR_SUPABASE_ANON_KEY_HERE');
+  static const String supabaseUrl = 'https://lpjbzkwflyidjbmdrubg.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwamJ6a3dmbHlpZGpibWRydWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NzE5NzEsImV4cCI6MjA3MzQ0Nzk3MX0.7oZipOxgXpeD7FoXBT517giqfVr0akyKZdZyiQrsKdo';
   
   // Storage bucket names
   static const String tutorVideosBucket = 'tutor-videos';

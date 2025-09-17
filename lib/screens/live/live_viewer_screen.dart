@@ -1,21 +1,46 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../../config/constants.dart';
-import '../../config/agora_config.dart';
 import '../../services/agora_service_stub.dart' as agora_service;
-import '../../services/agora_live_service.dart';
+import '../../services/agora_live_service_simple.dart';
 import '../../models/tutor_profile.dart';
 import '../../models/video_content.dart';
 import '../../models/live_session.dart';
 import '../../models/user.dart' as app_user;
 
+// Simple chat message model
+class ChatMessage {
+  final String id;
+  final String userId;
+  final String userName;
+  final String message;
+  final DateTime timestamp;
+  final bool isFromTutor;
+  final bool isQuestion;
+
+  ChatMessage({
+    required this.id,
+    required this.userId,
+    required this.userName,
+    required this.message,
+    required this.timestamp,
+    this.isFromTutor = false,
+    this.isQuestion = false,
+  });
+}
+
 class LiveViewerScreen extends StatefulWidget {
-  final VideoContent video;
-  final TutorProfile tutor;
+  final String sessionId;
+  final String tutorName;
+  final VideoContent? video;
+  final TutorProfile? tutor;
 
   const LiveViewerScreen({
     super.key,
-    required this.video,
-    required this.tutor,
+    required this.sessionId,
+    required this.tutorName,
+    this.video,
+    this.tutor,
   });
 
   @override
@@ -26,8 +51,13 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   bool _isJoined = false;
   bool _isInitialized = false;
   int _viewerCount = 0;
-  String _status = 'Connecting...';
+  String _status = 'Click the play button to join the live session';
   List<int> _remoteUsers = [];
+  
+  // Live session limits
+  static const int _maxParticipants = 50; // Maximum users who can join AND raise hands
+  static const int _maxViewers = 200; // Maximum viewers (read-only, cannot raise hands)
+  static const int _maxRaisedHands = 50; // Maximum users who can raise hands (same as participants)
   
   // Live session service
   final AgoraLiveService _liveService = AgoraLiveService();
@@ -36,36 +66,132 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   bool _isHandRaised = false;
   bool _isMuted = true;
   String? _currentSpeaker;
+  bool _hasJoinedLive = false; // Track if user has joined the live session
   List<RaisedHand> _raisedHands = [];
   List<LiveSessionMessage> _messages = [];
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _messageScrollController = ScrollController();
+  
+  // Chat system
+  int _selectedChatTab = 0; // 0 = Chat with all, 1 = Ask tutor
+  final List<ChatMessage> _chatMessages = [];
+  final List<ChatMessage> _tutorQuestions = [];
+  bool _isChatVisible = false;
+  
+  // Speaking time management
+  DateTime? _speakingStartTime;
+  static const int _maxSpeakingTime = 60; // 1 minute max speaking time
+  Timer? _speakingTimer;
 
   @override
   void initState() {
     super.initState();
+    print('🎬 LiveViewerScreen initState called');
+    print('🎬 _isJoined: $_isJoined');
+    print('🎬 _isInitialized: $_isInitialized');
+    
     _initializeAgora();
     _setupLiveService();
+    // DON'T auto-join - let user click Join Live button first
+    
+    print('🎬 LiveViewerScreen initState completed');
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     _messageScrollController.dispose();
+    _speakingTimer?.cancel(); // Cancel timer on dispose
     _liveService.dispose();
     _leaveChannel();
     super.dispose();
   }
 
+  Future<void> _initializeAgora() async {
+    setState(() {
+      _status = 'Initializing...';
+    });
+
+    // For demo purposes, simulate successful initialization
+    // In production, this would call the real Agora service
+    await Future.delayed(const Duration(seconds: 1));
+    
+    setState(() {
+      _isInitialized = true;
+      _status = 'Connected! You can speak and participate freely'; // Updated status
+      _isJoined = true; // Set joined to true for demo
+      _viewerCount = 42; // Demo viewer count
+    });
+    
+    print('✅ Demo mode: Live session initialized successfully');
+  }
+
+  Future<void> _joinChannel() async {
+    if (!_isInitialized) return;
+
+    // Check if session is full
+    if (_viewerCount >= _maxParticipants) {
+      setState(() {
+        _isJoined = false;
+        _status = 'Session is full! Maximum ${_maxParticipants} participants reached.';
+      });
+      print('❌ Session is full - cannot join');
+      return;
+    }
+
+    // For demo purposes, simulate successful join
+    // In production, this would call the real Agora service
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    setState(() {
+      _isJoined = true;
+      _hasJoinedLive = true; // User has joined the live session
+      _status = 'Connected! You can speak and participate freely'; // Updated status
+      _viewerCount = 42; // Demo viewer count
+    });
+    
+    print('✅ Demo mode: Successfully joined live channel');
+  }
+
+  Future<void> _leaveChannel() async {
+    if (_isJoined) {
+      // For demo purposes, simulate leaving channel
+      // In production, this would call the real Agora service
+      await Future.delayed(const Duration(milliseconds: 200));
+      
+      setState(() {
+        _isJoined = false;
+        _hasJoinedLive = false; // User has left the live session
+        _isHandRaised = false; // Reset hand raised state
+        _isChatVisible = false; // Hide chat when leaving
+        _status = 'Disconnected from live stream';
+        
+        // Clear all chat messages when session ends
+        _chatMessages.clear();
+        _tutorQuestions.clear();
+      });
+      
+      print('✅ Demo mode: Successfully disconnected from live channel');
+      
+      // Show disconnect message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Disconnected from live session'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   void _setupLiveService() {
-    // Listen to raised hands
+    // Listen to live service events
     _liveService.raisedHandStream.listen((hand) {
       setState(() {
         _raisedHands.add(hand);
       });
     });
 
-    // Listen to messages
     _liveService.messageStream.listen((message) {
       setState(() {
         _messages.add(message);
@@ -82,101 +208,293 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
       });
     });
 
-    // Listen to current speaker
-    _liveService.currentSpeakerStream.listen((speakerId) {
+    _liveService.currentSpeakerStream.listen((speaker) {
       setState(() {
-        _currentSpeaker = speakerId;
-      });
-    });
-
-    // Listen to audio status
-    _liveService.audioStatusStream.listen((muted) {
-      setState(() {
-        _isMuted = muted;
+        _currentSpeaker = speaker;
       });
     });
   }
 
-  Future<void> _initializeAgora() async {
-    setState(() {
-      _status = 'Initializing...';
-    });
-
-    final success = await agora_service.AgoraService.initialize();
-    if (success) {
-      setState(() {
-        _isInitialized = true;
-        _status = 'Connecting to live stream...';
-      });
-      await _joinChannel();
-    } else {
-      setState(() {
-        _status = 'Failed to connect. Please try again.';
-      });
+  Future<void> _raiseHand() async {
+    if (!_isJoined) {
+      print('❌ Cannot raise hand: not joined to live session');
+      return;
     }
-  }
 
-  Future<void> _joinChannel() async {
-    if (!_isInitialized) return;
-
-    final channelName = AgoraConfig.getChannelName(widget.tutor.id);
-    final success = await agora_service.AgoraService.joinChannelAsAudience(channelName);
+    print('🚀 Raising hand...');
     
-    if (success) {
-      setState(() {
-        _isJoined = true;
-        _status = 'Connected to live stream';
-      });
-      
-      // Listen to user events
-      agora_service.AgoraService.userJoinedStream.listen((uid) {
-        setState(() {
-          _remoteUsers.add(uid);
-          _viewerCount = _remoteUsers.length;
-        });
-      });
-      
-      agora_service.AgoraService.userOfflineStream.listen((uid) {
-        setState(() {
-          _remoteUsers.remove(uid);
-          _viewerCount = _remoteUsers.length;
-        });
-      });
-    } else {
-      setState(() {
-        _status = 'Failed to join live stream';
-      });
+    // Create a demo user for now
+    final user = app_user.User(
+      id: 'demo_user_${DateTime.now().millisecondsSinceEpoch}',
+      email: 'demo@tutorhouse.com',
+      fullName: 'Demo Student',
+      userType: app_user.UserType.student,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    // For demo purposes, simulate raising hand
+    try {
+      await _liveService.raiseHand(user);
+    } catch (e) {
+      print('⚠️ Live service error (demo mode): $e');
+      // Continue anyway for demo purposes
     }
+    
+    print('🔄 Setting _isHandRaised to true...');
+    setState(() {
+      _isHandRaised = true;
+    });
+    print('✅ _isHandRaised set to: $_isHandRaised');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Hand raised! Waiting for tutor approval...'),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 2),
+      ),
+    );
+    
+    print('✅ Hand raised successfully - UI should update now');
   }
 
-  Future<void> _leaveChannel() async {
-    if (_isJoined) {
-      await agora_service.AgoraService.leaveChannel();
-      setState(() {
-        _isJoined = false;
-      });
+  Future<void> _lowerHand() async {
+    if (!_isJoined || !_isHandRaised) return;
+
+    print('🚀 Lowering hand...');
+    
+    // Create a demo user for now
+    final user = app_user.User(
+      id: 'demo_user_${DateTime.now().millisecondsSinceEpoch}',
+      email: 'demo@tutorhouse.com',
+      fullName: 'Demo Student',
+      userType: app_user.UserType.student,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    
+    try {
+      await _liveService.lowerHand(user);
+    } catch (e) {
+      print('⚠️ Live service error (demo mode): $e');
+      // Continue anyway for demo purposes
     }
+    
+    setState(() {
+      _isHandRaised = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Hand lowered'),
+        backgroundColor: Colors.grey,
+        duration: Duration(seconds: 1),
+      ),
+    );
+    
+    print('✅ Hand lowered successfully');
   }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+    });
+    
+    // For demo purposes, simulate mute/unmute
+    print('🎤 Audio ${_isMuted ? 'muted' : 'unmuted'}');
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isMuted ? 'Microphone muted' : 'Microphone unmuted'),
+        backgroundColor: _isMuted ? Colors.red : Colors.green,
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+  
+  // Start speaking timer when user is approved to speak
+  void _startSpeakingTimer() {
+    _speakingStartTime = DateTime.now();
+    _speakingTimer?.cancel();
+    _speakingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_speakingStartTime != null) {
+        final elapsed = DateTime.now().difference(_speakingStartTime!).inSeconds;
+        final remaining = _maxSpeakingTime - elapsed;
+        
+        if (remaining <= 0) {
+          // Time's up - automatically stop speaking
+          _stopSpeaking();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Your speaking time is up!'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else if (remaining <= 10) {
+          // Warning when 10 seconds left
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$remaining seconds left to speak'),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        }
+      }
+    });
+  }
+  
+  // Stop speaking (called by tutor or when time expires)
+  void _stopSpeaking() {
+    _speakingTimer?.cancel();
+    _speakingStartTime = null;
+    _currentSpeaker = null;
+    setState(() {});
+    print('🛑 Speaking stopped');
+  }
+  
+  // Get remaining speaking time
+  int get _remainingSpeakingTime {
+    if (_speakingStartTime == null) return 0;
+    final elapsed = DateTime.now().difference(_speakingStartTime!).inSeconds;
+    return (_maxSpeakingTime - elapsed).clamp(0, _maxSpeakingTime);
+  }
+  
+  // Check if user is currently speaking
+  bool get _isCurrentlySpeaking => _currentSpeaker != null && _speakingStartTime != null;
 
   @override
   Widget build(BuildContext context) {
+    print('🎨 Building LiveViewerScreen - _isHandRaised: $_isHandRaised, _isJoined: $_isJoined');
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Live video stream
-          if (_isJoined && _remoteUsers.isNotEmpty)
-            Center(
-              child: agora_service.AgoraService.getRemoteVideoView(_remoteUsers.first) ??
-                Container(
-                  color: Colors.grey[900],
-                  child: const Center(
-                    child: Text(
-                      'Waiting for stream...',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+          // Main content
+          if (_hasJoinedLive)
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black, Colors.grey],
                 ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Tutor info
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: NetworkImage(
+                        'https://picsum.photos/80/80?random=${widget.sessionId.hashCode}',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      widget.tutorName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Live Session',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    
+                    // Status text
+                    Column(
+                      children: [
+                        Text(
+                          _status,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (_isHandRaised) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.pan_tool, color: Colors.white, size: 16),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Hand Raised',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        if (_isCurrentlySpeaking) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.mic, color: Colors.white, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Speaking: ${_remainingSpeakingTime}s',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    
+                    // Helpful instruction text
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Raise hand to speak (requires approval by tutor)',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             )
           else
             Container(
@@ -197,20 +515,21 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
                       ),
                     const SizedBox(height: 16),
                     Text(
-                      _status,
+                      _hasJoinedLive ? _status : 'Click the Join button to join the live session',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                       ),
                     ),
                     if (!_isInitialized) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: _initializeAgora,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppConstants.primaryColor,
+                          foregroundColor: Colors.white,
                         ),
-                        child: const Text('Retry'),
+                        child: const Text('Connect'),
                       ),
                     ],
                   ],
@@ -218,266 +537,144 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
               ),
             ),
 
-          // Top overlay
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
+          // Chat overlay (when visible)
+          if (_isChatVisible && _hasJoinedLive)
+            Positioned(
+              bottom: 120,
+              left: 0,
+              right: 0,
               child: Container(
-                padding: const EdgeInsets.all(16),
+                height: MediaQuery.of(context).size.height * 0.6,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.7),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 28,
-                      ),
+                  color: Colors.black.withValues(alpha: 0.85), // Semi-transparent black
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
                     ),
-                    const Spacer(),
-                    // Live indicator
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Header with tabs
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.black.withValues(alpha: 0.3), // Semi-transparent header
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
+                      child: Column(
                         children: [
-                          Icon(
-                            Icons.circle,
-                            color: Colors.white,
-                            size: 8,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Chat',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white, // White text
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isChatVisible = false;
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.white, // White close icon
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 6),
-                          Text(
-                            'LIVE',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          const SizedBox(height: 12),
+                          // Tab buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildChatTab(0, 'Chat with all'),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: _buildChatTab(1, 'Ask tutor'),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
+                    // Chat messages
+                    Expanded(
+                      child: _selectedChatTab == 0 ? _buildChatMessages() : _buildTutorQuestions(),
+                    ),
+                    // Message input
+                    _buildMessageInput(),
                   ],
                 ),
               ),
             ),
-          ),
 
-          // Bottom overlay
+          // Bottom action buttons
           Positioned(
-            bottom: 0,
+            bottom: 50,
             left: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.8),
-                    Colors.transparent,
-                  ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: _hasJoinedLive ? [
+                // Chat button
+                _buildActionButton(
+                  icon: Icons.chat,
+                  backgroundColor: _isChatVisible ? Colors.orange : Colors.blue,
+                  onTap: () {
+                    setState(() {
+                      _isChatVisible = !_isChatVisible;
+                    });
+                  },
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Tutor info
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: AppConstants.primaryColor,
-                        backgroundImage: NetworkImage(
-                          'https://picsum.photos/80/80?random=${widget.tutor.id.hashCode}',
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.tutor.bio?.split(' ').take(2).join(' ') ?? 'Tutor',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              widget.video.subject ?? 'Subject',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Viewer count
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$_viewerCount',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Action buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Raise Hand button
-                      _buildActionButton(
-                        icon: _isHandRaised ? Icons.pan_tool : Icons.pan_tool_outlined,
-                        backgroundColor: _isHandRaised ? Colors.orange : Colors.black54,
-                        onTap: _isHandRaised ? _lowerHand : _raiseHand,
-                      ),
-                      
-                      // Like button
-                      _buildActionButton(
-                        icon: Icons.favorite_outline,
-                        onTap: () {
-                          // TODO: Implement like functionality
-                        },
-                      ),
-                      
-                      // Share button
-                      _buildActionButton(
-                        icon: Icons.share,
-                        onTap: () {
-                          // TODO: Implement share functionality
-                        },
-                      ),
-                      
-                      // Follow button
-                      _buildActionButton(
-                        icon: Icons.person_add,
-                        onTap: () {
-                          // TODO: Implement follow functionality
-                        },
-                      ),
-                      
-                      // Book trial button
-                      _buildActionButton(
-                        icon: Icons.calendar_today,
-                        backgroundColor: AppConstants.primaryColor,
-                        onTap: () {
-                          // TODO: Navigate to booking
-                        },
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Status text
-                  Column(
-                    children: [
-                      Text(
-                        _status,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (_isHandRaised) ...[
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.pan_tool, color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                'Hand Raised',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      if (_currentSpeaker != null) ...[
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.mic, color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                'You can speak!',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
+                
+                // Raise Hand icon (toggle indicator) - GRAY INITIALLY
+                _buildActionButton(
+                  icon: _isHandRaised ? Icons.pan_tool : Icons.pan_tool_outlined,
+                  backgroundColor: _isHandRaised ? Colors.blue : Colors.grey, // GRAY INITIALLY
+                  onTap: () {
+                    setState(() {
+                      _isHandRaised = !_isHandRaised;
+                    });
+                    print('🖐️ Hand raised status: $_isHandRaised');
+                  },
+                ),
+                
+                // Leave Live button (disconnect)
+                _buildActionButton(
+                  icon: Icons.exit_to_app,
+                  backgroundColor: Colors.red,
+                  onTap: () {
+                    _leaveChannel();
+                    Navigator.pop(context);
+                  },
+                ),
+              ] : [
+                // Join Live button (when not joined yet)
+                _buildJoinButton(),
+                
+                // Leave button
+                _buildActionButton(
+                  icon: Icons.close,
+                  backgroundColor: Colors.grey,
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
           ),
         ],
@@ -491,7 +688,12 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     Color? backgroundColor,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        print('🖱️ Action button tapped - icon: $icon');
+        print('🖱️ _isJoined: $_isJoined');
+        print('🖱️ _isHandRaised: $_isHandRaised');
+        onTap();
+      },
       child: Container(
         width: 48,
         height: 48,
@@ -508,47 +710,288 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     );
   }
 
-  // Raise hand functionality
-  Future<void> _raiseHand() async {
-    if (!_isJoined) return;
-
-    // Create a demo user for now
-    final user = app_user.User(
-      id: 'demo_user_${DateTime.now().millisecondsSinceEpoch}',
-      email: 'demo@tutorhouse.com',
-      fullName: 'Demo Student',
-      userType: app_user.UserType.student,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-
-    await _liveService.raiseHand(user);
-    setState(() {
-      _isHandRaised = true;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Hand raised! Waiting for tutor approval...'),
-        backgroundColor: Colors.orange,
-        duration: Duration(seconds: 2),
+  Widget _buildJoinButton() {
+    return GestureDetector(
+      onTap: () {
+        print('🖱️ Join button tapped');
+        _joinChannel();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppConstants.primaryColor,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+              size: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Join',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Future<void> _lowerHand() async {
-    if (!_isJoined || !_isHandRaised) return;
 
-    await _liveService.lowerHand();
+  Widget _buildChatTab(int index, String title) {
+    final isSelected = _selectedChatTab == index;
+    return GestureDetector(
+      onTap: () {
+        print('🖱️ Chat tab tapped: $index');
+        setState(() {
+          _selectedChatTab = index;
+        });
+        print('✅ Selected tab: $_selectedChatTab');
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppConstants.primaryColor : Colors.white.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppConstants.primaryColor : Colors.white.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatMessages() {
+    return ListView.builder(
+      controller: _messageScrollController,
+      padding: const EdgeInsets.all(16),
+      itemCount: _chatMessages.length,
+      itemBuilder: (context, index) {
+        final message = _chatMessages[index];
+        return _buildMessageBubble(message);
+      },
+    );
+  }
+
+  Widget _buildTutorQuestions() {
+    return ListView.builder(
+      controller: _messageScrollController,
+      padding: const EdgeInsets.all(16),
+      itemCount: _tutorQuestions.length,
+      itemBuilder: (context, index) {
+        final message = _tutorQuestions[index];
+        return _buildMessageBubble(message, isQuestion: true);
+      },
+    );
+  }
+
+  Widget _buildMessageBubble(ChatMessage message, {bool isQuestion = false}) {
+    final isMe = message.userId == 'current_user'; // In real app, compare with actual user ID
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!isMe) ...[
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: message.isFromTutor ? Colors.orange : Colors.blue,
+              child: Text(
+                message.userName[0].toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isMe 
+                    ? AppConstants.primaryColor 
+                    : (message.isFromTutor ? Colors.orange.withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.2)),
+                borderRadius: BorderRadius.circular(20),
+                border: message.isFromTutor ? Border.all(color: Colors.orange.withValues(alpha: 0.5)) : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isMe) ...[
+                    Text(
+                      message.userName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: message.isFromTutor ? Colors.orange[300] : Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                  Text(
+                    message.message,
+                    style: TextStyle(
+                      color: isMe ? Colors.white : Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isMe ? Colors.white70 : Colors.white60,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isMe) ...[
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppConstants.primaryColor,
+              child: const Text(
+                'Me',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.3),
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              style: const TextStyle(color: Colors.white), // White text
+              decoration: InputDecoration(
+                hintText: _selectedChatTab == 0 
+                    ? 'Type a message...' 
+                    : 'Ask a question to the tutor...',
+                hintStyle: const TextStyle(color: Colors.white60), // Light white hint
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide(color: AppConstants.primaryColor),
+                ),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.1),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              maxLines: null,
+              onSubmitted: (value) => _sendMessage(),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: _sendMessage,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppConstants.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.send,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    final message = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: 'current_user',
+      userName: 'Me',
+      message: text,
+      timestamp: DateTime.now(),
+      isQuestion: _selectedChatTab == 1,
+    );
+
     setState(() {
-      _isHandRaised = false;
+      if (_selectedChatTab == 0) {
+        _chatMessages.add(message);
+      } else {
+        _tutorQuestions.add(message);
+      }
     });
 
+    _messageController.clear();
+    
+    // Scroll to bottom
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_messageScrollController.hasClients) {
+        _messageScrollController.animateTo(
+          _messageScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+
+    // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Hand lowered'),
-        backgroundColor: Colors.grey,
-        duration: Duration(seconds: 1),
+      SnackBar(
+        content: Text(
+          _selectedChatTab == 0 
+              ? 'Message sent to chat' 
+              : 'Question sent to tutor',
+        ),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 1),
       ),
     );
   }

@@ -323,7 +323,7 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
                         decoration: BoxDecoration(
                           color: index <= _currentStep
                               ? AppConstants.primaryColor
-                              : AppConstants.textSecondary.withOpacity(0.3),
+                              : AppConstants.textSecondary.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -546,7 +546,7 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
                     border: Border.all(
                       color: isSelected 
                           ? AppConstants.primaryColor 
-                          : AppConstants.textSecondary.withOpacity(0.3),
+                          : AppConstants.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -748,7 +748,7 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
           Text(
             'Supported video formats: MP4, MOV, AVI, MKV, WebM, M4V',
             style: TextStyle(
-              color: AppConstants.textSecondary.withOpacity(0.7),
+              color: AppConstants.textSecondary.withValues(alpha: 0.7),
               fontSize: 12,
             ),
           ),
@@ -761,7 +761,7 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
               color: AppConstants.surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppConstants.textSecondary.withOpacity(0.3),
+                color: AppConstants.textSecondary.withValues(alpha: 0.3),
               ),
             ),
             child: _introVideoPath != null && _videoController != null
@@ -904,7 +904,7 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Row(
@@ -936,8 +936,8 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: filePath != null 
-              ? Colors.green.withOpacity(0.3)
-              : AppConstants.textSecondary.withOpacity(0.3),
+              ? Colors.green.withValues(alpha: 0.3)
+              : AppConstants.textSecondary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
