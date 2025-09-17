@@ -1,6 +1,5 @@
 import '../models/video_content.dart';
 import '../models/live_session.dart';
-import '../models/tutor_profile.dart';
 import 'sample_data_service.dart';
 
 /// Service to mix videos and live sessions in the main feed
@@ -110,7 +109,6 @@ class FeedContentService {
     if (_useSampleData) {
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 1000));
-      print('🎥 User $userId joined live session $sessionId');
       return true;
     }
     return false;
@@ -121,7 +119,6 @@ class FeedContentService {
     if (_useSampleData) {
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 500));
-      print('🎥 User $userId left live session $sessionId');
       return true;
     }
     return false;
@@ -132,7 +129,6 @@ class FeedContentService {
     if (_useSampleData) {
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 500));
-      print('✋ User $userName raised hand in session $sessionId');
       return true;
     }
     return false;
@@ -143,7 +139,6 @@ class FeedContentService {
     if (_useSampleData) {
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 300));
-      print('✋ User $userId lowered hand in session $sessionId');
       return true;
     }
     return false;
@@ -159,7 +154,6 @@ class FeedContentService {
     if (_useSampleData) {
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 200));
-      print('💬 User $userName sent message in session $sessionId: $message');
       return true;
     }
     return false;
@@ -187,7 +181,6 @@ class FeedContentService {
   static Future<bool> approveRaisedHand(String sessionId, String handId) async {
     if (_useSampleData) {
       await Future.delayed(const Duration(milliseconds: 500));
-      print('✅ Raised hand $handId approved in session $sessionId');
       return true;
     }
     return false;
@@ -197,7 +190,6 @@ class FeedContentService {
   static Future<bool> rejectRaisedHand(String sessionId, String handId) async {
     if (_useSampleData) {
       await Future.delayed(const Duration(milliseconds: 500));
-      print('❌ Raised hand $handId rejected in session $sessionId');
       return true;
     }
     return false;

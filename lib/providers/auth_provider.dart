@@ -28,7 +28,6 @@ class AuthProvider extends ChangeNotifier {
   // Initialize auth state from storage
   Future<void> initialize() async {
     try {
-      print('🚀 AuthProvider.initialize() called');
       
       // Load user and token from AuthService
       await AuthService.initialize();
@@ -40,16 +39,8 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       _error = null;
       
-      print('✅ AuthProvider initialized - isAuthenticated: $isAuthenticated');
-      print('✅ User: ${_user?.email}');
-      print('✅ Token expires: $_tokenExpiry');
-      print('✅ AuthService.isAuthenticated: ${AuthService.isAuthenticated}');
-      print('✅ AuthService.currentUser: ${AuthService.currentUser?.email}');
-      print('✅ AuthService.authToken: ${AuthService.authToken?.substring(0, 20)}...');
-      print('✅ AuthService.tokenExpiry: ${AuthService.tokenExpiry}');
       
     } catch (e) {
-      print('❌ Error initializing AuthProvider: $e');
       _user = null;
       _authToken = null;
       _tokenExpiry = null;
@@ -67,7 +58,6 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
     
     try {
-      print('🚀 AuthProvider.signIn called for: $email');
       
       final result = await AuthService.signIn(
         email: email,
@@ -80,7 +70,6 @@ class AuthProvider extends ChangeNotifier {
         _authToken = AuthService.authToken;
         _tokenExpiry = AuthService.tokenExpiry;
         
-        print('✅ AuthProvider sign in successful');
         notifyListeners();
       } else {
         _setError(result['message'] ?? 'Sign in failed');
@@ -88,7 +77,6 @@ class AuthProvider extends ChangeNotifier {
       
       return result;
     } catch (e) {
-      print('❌ Error in AuthProvider.signIn: $e');
       _setError('Sign in failed: $e');
       return {
         'success': false,
@@ -110,7 +98,6 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
     
     try {
-      print('🚀 AuthProvider.signUp called for: $email');
       
       final result = await AuthService.signUp(
         email: email,
@@ -125,7 +112,6 @@ class AuthProvider extends ChangeNotifier {
         _authToken = AuthService.authToken;
         _tokenExpiry = AuthService.tokenExpiry;
         
-        print('✅ AuthProvider sign up successful');
         notifyListeners();
       } else {
         _setError(result['message'] ?? 'Sign up failed');
@@ -133,7 +119,6 @@ class AuthProvider extends ChangeNotifier {
       
       return result;
     } catch (e) {
-      print('❌ Error in AuthProvider.signUp: $e');
       _setError('Sign up failed: $e');
       return {
         'success': false,
@@ -150,7 +135,6 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
     
     try {
-      print('🚀 AuthProvider.signOut called');
       
       await AuthService.signOut();
       
@@ -159,10 +143,8 @@ class AuthProvider extends ChangeNotifier {
       _authToken = null;
       _tokenExpiry = null;
       
-      print('✅ AuthProvider sign out successful');
       notifyListeners();
     } catch (e) {
-      print('❌ Error in AuthProvider.signOut: $e');
       _setError('Sign out failed: $e');
     } finally {
       _setLoading(false);
@@ -175,7 +157,6 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
     
     try {
-      print('🚀 AuthProvider.forceLogout called');
       
       await AuthService.forceLogout();
       
@@ -184,10 +165,8 @@ class AuthProvider extends ChangeNotifier {
       _authToken = null;
       _tokenExpiry = null;
       
-      print('✅ AuthProvider force logout successful');
       notifyListeners();
     } catch (e) {
-      print('❌ Error in AuthProvider.forceLogout: $e');
       _setError('Force logout failed: $e');
     } finally {
       _setLoading(false);
@@ -199,18 +178,14 @@ class AuthProvider extends ChangeNotifier {
     if (!isAuthenticated) return;
     
     try {
-      print('🔄 AuthProvider.refreshToken called');
       
       // In a real app, you would call your backend to refresh the token
       // For demo purposes, we'll just check if the current token is still valid
       if (!_isTokenValid()) {
-        print('❌ Token expired, signing out');
         await forceLogout();
       } else {
-        print('✅ Token is still valid');
       }
     } catch (e) {
-      print('❌ Error refreshing token: $e');
       await forceLogout();
     }
   }
@@ -238,16 +213,12 @@ class AuthProvider extends ChangeNotifier {
   
   // Force refresh auth state from AuthService
   Future<void> refreshAuthState() async {
-    print('🔄 AuthProvider.refreshAuthState called');
     
     // Reload from AuthService
     _user = AuthService.currentUser;
     _authToken = AuthService.authToken;
     _tokenExpiry = AuthService.tokenExpiry;
     
-    print('🔄 Auth state refreshed - isAuthenticated: $isAuthenticated');
-    print('🔄 User: ${_user?.email}');
-    print('🔄 Token expires: $_tokenExpiry');
     
     notifyListeners();
   }

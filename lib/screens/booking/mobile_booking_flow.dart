@@ -36,8 +36,6 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
   }
 
   void _loadAvailableDates() {
-    print('📅 _loadAvailableDates called for tutor: ${_tutor?.id}');
-    print('📅 Tutor availability: ${_tutor?.availability}');
     
     if (_tutor?.availability != null) {
       final now = DateTime.now();
@@ -54,18 +52,14 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
         if (_tutor!.availability!.containsKey(dayName) && 
             _tutor!.availability![dayName]!.isNotEmpty) {
           availableDates.add(normalizedDate);
-          print('📅 Available date found: $normalizedDate ($dayName)');
         }
       }
       
-      print('📅 Total available dates: ${availableDates.length}');
-      print('📅 Available dates: $availableDates');
       
       setState(() {
         _availableDates = availableDates;
       });
     } else {
-      print('📅 No availability data found for tutor');
     }
   }
 
@@ -154,10 +148,6 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                         // Normalize selected day to midnight for comparison
                         final normalizedSelectedDay = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
                         
-                        print('📅 Calendar onDaySelected: $selectedDay');
-                        print('📅 Normalized selected day: $normalizedSelectedDay');
-                        print('📅 Available dates: $_availableDates');
-                        print('📅 Is available: ${_availableDates.contains(normalizedSelectedDay)}');
                         
                         // Only allow selection of available dates
                         if (_availableDates.contains(normalizedSelectedDay)) {
@@ -165,9 +155,7 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                             _selectedDate = selectedDay;
                             _selectedTime = null; // Clear time when date changes
                           });
-                          print('📅 Date selected: $selectedDay');
                         } else {
-                          print('📅 Date not available: $selectedDay');
                         }
                       },
                       eventLoader: (day) {
@@ -175,7 +163,6 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                         final normalizedDay = DateTime(day.year, day.month, day.day);
                         final isAvailable = _availableDates.contains(normalizedDay);
                         if (isAvailable) {
-                          print('📅 Calendar eventLoader: $day is available');
                           return ['available'];
                         }
                         return [];
@@ -477,14 +464,12 @@ class _MobileBookingFlowState extends State<MobileBookingFlow> {
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () {
-                    print('🕐 Time selected: $time');
                     setState(() {
                       _selectedTime = TimeOfDay(
                         hour: int.parse(time.split(':')[0]),
                         minute: int.parse(time.split(':')[1]),
                       );
                     });
-                    print('🕐 Selected time set: ${_selectedTime?.format(context)}');
                   },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),

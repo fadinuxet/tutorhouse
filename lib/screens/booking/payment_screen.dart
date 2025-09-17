@@ -5,7 +5,6 @@ import '../../services/payment_service.dart';
 import '../../services/google_meet_service.dart';
 import '../../services/booking_service.dart';
 import '../../services/auth_service.dart';
-import '../../providers/tutor_provider.dart';
 import '../../main.dart';
 import '../../models/tutor_profile.dart';
 import '../../models/user.dart' as app_user;
@@ -155,15 +154,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
 
     // Create booking in the system
-    print('🚀 PaymentScreen: About to create booking...');
-    print('   studentId: ${student.id}');
-    print('   tutorId: ${widget.tutor.id}');
-    print('   subject: ${widget.subject}');
-    print('   sessionTime: ${widget.selectedDateTime}');
-    print('   durationMinutes: ${widget.durationMinutes}');
-    print('   price: ${widget.totalAmount}');
-    print('   isTrial: ${widget.totalAmount == 0.0}');
-    print('   meetLink: $meetLink');
     
     final bookingResult = await BookingService.createBooking(
       studentId: student.id,
@@ -176,7 +166,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       meetLink: meetLink,
     );
     
-    print('📝 PaymentScreen: Booking result: $bookingResult');
     
     // Debug: Check all bookings
     BookingService.getAllBookings();
@@ -193,7 +182,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
     // Update TutorProvider if this is a trial booking
     if (widget.totalAmount == 0.0) {
-      print('📝 PaymentScreen: Updating TutorProvider for trial booking');
       final tutor = ref.read(tutorProvider);
       await tutor.bookTrialWithTutor(widget.tutor.id, widget.selectedDateTime);
     }

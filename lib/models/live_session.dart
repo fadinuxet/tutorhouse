@@ -1,5 +1,4 @@
 import 'tutor_profile.dart';
-import 'user.dart' as app_user;
 
 enum LiveSessionStatus {
   scheduled,

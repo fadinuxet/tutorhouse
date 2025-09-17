@@ -39,7 +39,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
   @override
   void initState() {
     super.initState();
-    print('🎬 VideoFeedScreen initState called');
     WidgetsBinding.instance.addObserver(this);
     _currentIndex = widget.initialIndex ?? 0;
     _pageController = PageController(initialPage: _currentIndex);
@@ -70,7 +69,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Refresh the screen when authentication state changes
-    print('🔄 Dependencies changed, refreshing booking status...');
     // Use addPostFrameCallback to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -83,7 +81,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      print('🔄 App resumed, refreshing booking status...');
       // Use addPostFrameCallback to avoid setState during build
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -101,34 +98,25 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
   }
 
   Future<void> _loadVideos() async {
-    print('🎬 Loading mixed content...');
     setState(() {
       _isLoading = true;
     });
 
     try {
       // Load mixed content (videos + live sessions)
-      print('🎬 Getting mixed feed...');
       final feedContent = await FeedContentService.getMixedFeed();
-      print('🎬 Got ${feedContent.length} items');
       
-      print('🎬 Getting sample tutors...');
       final tutors = await SampleDataService.getSampleTutors();
-      print('🎬 Got ${tutors.length} tutors');
       
-      print('🎬 Setting state...');
       setState(() {
         _feedContent = feedContent;
         _tutors = tutors;
         _isLoading = false;
       });
-      print('🎬 Mixed feed state updated successfully');
     } catch (e, stackTrace) {
       setState(() {
         _isLoading = false;
       });
-      print('❌ Error loading content: $e');
-      print('❌ Stack trace: $stackTrace');
     }
   }
 
@@ -316,12 +304,10 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
   }
 
   bool _hasBookedTrialWithTutor(String tutorId, TutorProvider tutorProvider) {
-    print('🔍 _hasBookedTrialWithTutor called for tutor: $tutorId');
     
     // Use cached result if available
     if (_trialBookingCache.containsKey(tutorId)) {
       final hasBooking = _trialBookingCache[tutorId]!;
-      print('🔍 Cache result: $hasBooking');
       return hasBooking;
     }
     
@@ -331,7 +317,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
     // Cache the result
     _trialBookingCache[tutorId] = hasBooking;
     
-    print('🔍 TutorProvider result: $hasBooking');
     
     return hasBooking;
   }
@@ -362,32 +347,26 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
 
   void _toggleFollow(String tutorId) {
     // TODO: Implement follow functionality
-    print('Toggle follow for tutor: $tutorId');
   }
 
   void _toggleLike(String videoId) {
     // TODO: Implement like functionality
-    print('Toggle like for video: $videoId');
   }
 
   void _shareVideo(VideoContent video) {
     // TODO: Implement share functionality
-    print('Share video: ${video.id}');
   }
 
   void _shareLiveSession(LiveSession session) {
     // TODO: Implement live session sharing
-    print('Share live session: ${session.id}');
   }
 
   void _raiseHand(String sessionId) {
     // TODO: Implement raise hand functionality
-    print('Raising hand for session: $sessionId');
   }
 
   void _handleJoinLiveSession(LiveSession session) {
     // This is handled by the LiveSessionWidget itself
-    print('Joining live session: ${session.title}');
   }
 
   String _getTutorName(String tutorId) {
@@ -525,7 +504,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                               child: GestureDetector(
                                 onTap: () {
                                   // TODO: Navigate to profile or show user menu
-                                  print('Profile button pressed!');
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -574,7 +552,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
                                 onTap: () {
-                                  print('Sign In button pressed!');
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -780,7 +757,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                               child: GestureDetector(
                                 onTap: () {
                                   // TODO: Navigate to profile or show user menu
-                                  print('Profile button pressed!');
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -829,7 +805,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> with WidgetsB
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
                                 onTap: () {
-                                  print('Sign In button pressed!');
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

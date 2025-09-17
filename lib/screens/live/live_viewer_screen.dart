@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../../config/constants.dart';
-import '../../services/agora_service_stub.dart' as agora_service;
 import '../../services/agora_live_service_simple.dart';
 import '../../models/tutor_profile.dart';
 import '../../models/video_content.dart';
@@ -52,12 +51,8 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   bool _isInitialized = false;
   int _viewerCount = 0;
   String _status = 'Click the play button to join the live session';
-  List<int> _remoteUsers = [];
-  
   // Live session limits
   static const int _maxParticipants = 50; // Maximum users who can join AND raise hands
-  static const int _maxViewers = 200; // Maximum viewers (read-only, cannot raise hands)
-  static const int _maxRaisedHands = 50; // Maximum users who can raise hands (same as participants)
   
   // Live session service
   final AgoraLiveService _liveService = AgoraLiveService();
@@ -67,8 +62,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   bool _isMuted = true;
   String? _currentSpeaker;
   bool _hasJoinedLive = false; // Track if user has joined the live session
-  List<RaisedHand> _raisedHands = [];
-  List<LiveSessionMessage> _messages = [];
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _messageScrollController = ScrollController();
   
@@ -86,15 +79,11 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   @override
   void initState() {
     super.initState();
-    print('🎬 LiveViewerScreen initState called');
-    print('🎬 _isJoined: $_isJoined');
-    print('🎬 _isInitialized: $_isInitialized');
     
     _initializeAgora();
     _setupLiveService();
     // DON'T auto-join - let user click Join Live button first
     
-    print('🎬 LiveViewerScreen initState completed');
   }
 
   @override
@@ -123,7 +112,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
       _viewerCount = 42; // Demo viewer count
     });
     
-    print('✅ Demo mode: Live session initialized successfully');
   }
 
   Future<void> _joinChannel() async {
@@ -135,7 +123,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
         _isJoined = false;
         _status = 'Session is full! Maximum ${_maxParticipants} participants reached.';
       });
-      print('❌ Session is full - cannot join');
       return;
     }
 
@@ -150,7 +137,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
       _viewerCount = 42; // Demo viewer count
     });
     
-    print('✅ Demo mode: Successfully joined live channel');
   }
 
   Future<void> _leaveChannel() async {
@@ -171,7 +157,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
         _tutorQuestions.clear();
       });
       
-      print('✅ Demo mode: Successfully disconnected from live channel');
       
       // Show disconnect message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -187,15 +172,11 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   void _setupLiveService() {
     // Listen to live service events
     _liveService.raisedHandStream.listen((hand) {
-      setState(() {
-        _raisedHands.add(hand);
-      });
+      // Handle raised hand events
     });
 
     _liveService.messageStream.listen((message) {
-      setState(() {
-        _messages.add(message);
-      });
+      // Handle message events
       // Auto-scroll to bottom
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_messageScrollController.hasClients) {
@@ -217,11 +198,9 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
 
   Future<void> _raiseHand() async {
     if (!_isJoined) {
-      print('❌ Cannot raise hand: not joined to live session');
       return;
     }
 
-    print('🚀 Raising hand...');
     
     // Create a demo user for now
     final user = app_user.User(
@@ -237,15 +216,12 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     try {
       await _liveService.raiseHand(user);
     } catch (e) {
-      print('⚠️ Live service error (demo mode): $e');
       // Continue anyway for demo purposes
     }
     
-    print('🔄 Setting _isHandRaised to true...');
     setState(() {
       _isHandRaised = true;
     });
-    print('✅ _isHandRaised set to: $_isHandRaised');
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -255,13 +231,11 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
       ),
     );
     
-    print('✅ Hand raised successfully - UI should update now');
   }
 
   Future<void> _lowerHand() async {
     if (!_isJoined || !_isHandRaised) return;
 
-    print('🚀 Lowering hand...');
     
     // Create a demo user for now
     final user = app_user.User(
@@ -276,7 +250,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     try {
       await _liveService.lowerHand(user);
     } catch (e) {
-      print('⚠️ Live service error (demo mode): $e');
       // Continue anyway for demo purposes
     }
     
@@ -292,7 +265,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
       ),
     );
     
-    print('✅ Hand lowered successfully');
   }
 
   void _toggleMute() {
@@ -301,7 +273,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     });
     
     // For demo purposes, simulate mute/unmute
-    print('🎤 Audio ${_isMuted ? 'muted' : 'unmuted'}');
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -351,7 +322,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     _speakingStartTime = null;
     _currentSpeaker = null;
     setState(() {});
-    print('🛑 Speaking stopped');
   }
   
   // Get remaining speaking time
@@ -366,7 +336,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('🎨 Building LiveViewerScreen - _isHandRaised: $_isHandRaised, _isJoined: $_isJoined');
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -649,7 +618,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
                     setState(() {
                       _isHandRaised = !_isHandRaised;
                     });
-                    print('🖐️ Hand raised status: $_isHandRaised');
                   },
                 ),
                 
@@ -689,9 +657,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   }) {
     return GestureDetector(
       onTap: () {
-        print('🖱️ Action button tapped - icon: $icon');
-        print('🖱️ _isJoined: $_isJoined');
-        print('🖱️ _isHandRaised: $_isHandRaised');
         onTap();
       },
       child: Container(
@@ -713,7 +678,6 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
   Widget _buildJoinButton() {
     return GestureDetector(
       onTap: () {
-        print('🖱️ Join button tapped');
         _joinChannel();
       },
       child: Container(
@@ -750,11 +714,9 @@ class _LiveViewerScreenState extends State<LiveViewerScreen> {
     final isSelected = _selectedChatTab == index;
     return GestureDetector(
       onTap: () {
-        print('🖱️ Chat tab tapped: $index');
         setState(() {
           _selectedChatTab = index;
         });
-        print('✅ Selected tab: $_selectedChatTab');
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

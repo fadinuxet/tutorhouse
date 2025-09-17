@@ -31,20 +31,17 @@ class AgoraService {
   static Future<bool> initialize() async {
     if (_isInitialized) return true;
     
-    print('Agora initialization skipped on web platform');
     _isInitialized = true;
     return true;
   }
 
   /// Join a channel as broadcaster (Web placeholder)
   static Future<bool> joinChannelAsBroadcaster(String channelName, {String? token}) async {
-    print('Live streaming not supported on web platform');
     return false;
   }
 
   /// Join a channel as audience (Web placeholder)
   static Future<bool> joinChannelAsAudience(String channelName, {String? token}) async {
-    print('Live streaming not supported on web platform');
     return false;
   }
 
@@ -55,38 +52,31 @@ class AgoraService {
     _isJoined = false;
     _currentChannel = null;
     _currentUid = null;
-    print('Left channel (web placeholder)');
     return true;
   }
 
   /// Start local video preview (Web placeholder)
   static Future<void> startPreview() async {
-    print('Video preview not supported on web platform');
   }
 
   /// Stop local video preview (Web placeholder)
   static Future<void> stopPreview() async {
-    print('Video preview not supported on web platform');
   }
 
   /// Enable/disable local video (Web placeholder)
   static Future<void> enableLocalVideo(bool enabled) async {
-    print('Video controls not supported on web platform');
   }
 
   /// Enable/disable local audio (Web placeholder)
   static Future<void> enableLocalAudio(bool enabled) async {
-    print('Audio controls not supported on web platform');
   }
 
   /// Mute/unmute local audio (Web placeholder)
   static Future<void> muteLocalAudioStream(bool muted) async {
-    print('Audio controls not supported on web platform');
   }
 
   /// Switch camera (Web placeholder)
   static Future<void> switchCamera() async {
-    print('Camera controls not supported on web platform');
   }
 
   /// Get video view widget for local video (Web placeholder)
@@ -123,6 +113,5 @@ class AgoraService {
     await _userJoinedController.close();
     await _userOfflineController.close();
     
-    print('Agora service disposed (web)');
   }
 }

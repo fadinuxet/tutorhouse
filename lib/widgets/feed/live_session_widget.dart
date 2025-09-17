@@ -413,18 +413,12 @@ class _LiveSessionWidgetState extends State<LiveSessionWidget> {
   }
 
   Future<void> _handleJoinSession() async {
-    print('🔍 _handleJoinSession called - BUTTON WAS CLICKED!');
-    print('🔍 AuthService.isAuthenticated: ${AuthService.isAuthenticated}');
-    print('🔍 widget.session.isLive: ${widget.session.isLive}');
-    print('🔍 _isJoining: $_isJoining');
     
     if (!AuthService.isAuthenticated) {
-      print('❌ User not authenticated, showing sign in dialog');
       _showSignInRequiredDialog();
       return;
     }
 
-    print('✅ User authenticated, setting _isJoining to true');
     setState(() {
       _isJoining = true;
     });

@@ -220,7 +220,6 @@ class _TutorOnboardingScreenState extends State<TutorOnboardingScreen> {
       await _videoController!.initialize();
       setState(() {});
     } catch (e) {
-      print('Error initializing video player: $e');
       // For demo, we'll just show a placeholder
     }
   }

@@ -4,7 +4,6 @@ import '../../config/constants.dart';
 import '../tutor/tutor_onboarding_screen.dart';
 import '../../models/user.dart' as app_user;
 import '../../services/auth_service.dart';
-import '../../providers/auth_provider.dart';
 import '../../main.dart';
 import '../feed/video_feed_screen.dart';
 
@@ -510,7 +509,6 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
         cursor: SystemMouseCursors.click,
         child: ElevatedButton(
           onPressed: _isLoading ? null : () {
-            print('🚀 Submit button pressed!');
             _handleSubmit();
           },
           style: ElevatedButton.styleFrom(
@@ -600,9 +598,7 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
   }
 
   Future<void> _handleSubmit() async {
-    print('🚀 _handleSubmit called - isSignUp: $_isSignUp');
     if (!_formKey.currentState!.validate()) {
-      print('❌ Form validation failed');
       return;
     }
 
@@ -612,7 +608,6 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
 
     try {
       if (_isSignUp) {
-        print('📝 Processing signup...');
         // Handle sign up using AuthProvider
         final auth = ref.read(authProvider);
         final result = await auth.signUp(
@@ -622,9 +617,7 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
           userType: app_user.UserType.student, // Always student for signup
         );
 
-        print('📝 Signup result: $result');
         if (result['success'] == true) {
-          print('✅ Signup successful, navigating to video feed...');
           // Navigate to video feed after successful signup
           if (mounted) {
             Navigator.of(context).pushReplacement(
@@ -646,7 +639,6 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
           }
         }
       } else {
-        print('🔑 Processing signin...');
         // Handle sign in using AuthProvider
         final auth = ref.read(authProvider);
         final result = await auth.signIn(
@@ -654,9 +646,7 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen>
           password: _passwordController.text,
         );
 
-        print('🔑 Signin result: $result');
         if (result['success'] == true) {
-          print('✅ Signin successful, navigating to video feed...');
           // Navigate to video feed
           if (mounted) {
             Navigator.of(context).pushReplacement(

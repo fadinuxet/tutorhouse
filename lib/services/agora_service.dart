@@ -37,13 +37,11 @@ class AgoraService {
     try {
       // Check if Agora is configured
       if (!AgoraConfig.isConfigured) {
-        print('Agora not configured. Please add your App ID to AgoraConfig.');
         return false;
       }
       
       // Skip initialization on web for now due to platformViewRegistry issue
       if (kIsWeb) {
-        print('Agora initialization skipped on web platform due to compatibility issues');
         _isInitialized = true;
         return true;
       }
@@ -76,10 +74,8 @@ class AgoraService {
       ));
       
       _isInitialized = true;
-      print('Agora RTC Engine initialized successfully');
       return true;
     } catch (e) {
-      print('Failed to initialize Agora RTC Engine: $e');
       return false;
     }
   }
@@ -90,7 +86,6 @@ class AgoraService {
     
     // Skip on web platform
     if (kIsWeb) {
-      print('Live streaming not supported on web platform');
       return false;
     }
     
@@ -109,10 +104,8 @@ class AgoraService {
       
       _currentChannel = channelName;
       _isJoined = true;
-      print('Joined channel as broadcaster: $channelName');
       return true;
     } catch (e) {
-      print('Failed to join channel as broadcaster: $e');
       return false;
     }
   }
@@ -123,7 +116,6 @@ class AgoraService {
     
     // Skip on web platform
     if (kIsWeb) {
-      print('Live streaming not supported on web platform');
       return false;
     }
     
@@ -142,10 +134,8 @@ class AgoraService {
       
       _currentChannel = channelName;
       _isJoined = true;
-      print('Joined channel as audience: $channelName');
       return true;
     } catch (e) {
-      print('Failed to join channel as audience: $e');
       return false;
     }
   }
@@ -159,10 +149,8 @@ class AgoraService {
       _isJoined = false;
       _currentChannel = null;
       _currentUid = null;
-      print('Left channel successfully');
       return true;
     } catch (e) {
-      print('Failed to leave channel: $e');
       return false;
     }
   }
@@ -265,28 +253,22 @@ class AgoraService {
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           _currentUid = connection.localUid;
           _connectionStateController.add(true);
-          print('Successfully joined channel: ${connection.channelId}');
         },
         onLeaveChannel: (RtcConnection connection, RtcStats stats) {
           _connectionStateController.add(false);
-          print('Left channel: ${connection.channelId}');
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           _userJoinedController.add(remoteUid);
-          print('User joined: $remoteUid');
         },
         onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
           _userOfflineController.add(remoteUid);
-          print('User offline: $remoteUid, reason: $reason');
         },
         onRtcStats: (RtcConnection connection, RtcStats stats) {
           _rtcStatsController.add(stats);
         },
         onError: (ErrorCodeType err, String msg) {
-          print('Agora error: $err - $msg');
         },
         onConnectionStateChanged: (RtcConnection connection, ConnectionStateType state, ConnectionChangedReasonType reason) {
-          print('Connection state changed: $state, reason: $reason');
         },
       ),
     );
@@ -316,6 +298,5 @@ class AgoraService {
     await _userOfflineController.close();
     await _rtcStatsController.close();
     
-    print('Agora service disposed');
   }
 }

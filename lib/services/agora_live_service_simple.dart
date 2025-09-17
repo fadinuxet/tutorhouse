@@ -35,7 +35,6 @@ class AgoraLiveService {
   String get userRole => _userRole;
 
   Future<void> initialize() async {
-    print('Agora service initialized (demo mode)');
   }
 
   Future<void> joinChannel({
@@ -45,7 +44,6 @@ class AgoraLiveService {
     required String role,
     required app_user.User user,
   }) async {
-    print('Demo mode: Joining channel $channelId as $role');
     _channelId = channelId;
     _token = token;
     _uid = uid;
@@ -54,18 +52,15 @@ class AgoraLiveService {
   }
 
   Future<void> leaveChannel() async {
-    print('Demo mode: Leaving channel');
     _isJoined = false;
     _isHandRaised = false;
   }
 
   Future<void> muteAudio(bool muted) async {
-    print('Demo mode: Audio ${muted ? 'muted' : 'unmuted'}');
     _isMuted = muted;
   }
 
   Future<void> muteVideo(bool muted) async {
-    print('Demo mode: Video ${muted ? 'muted' : 'unmuted'}');
   }
 
   // Raise hand functionality
@@ -89,7 +84,6 @@ class AgoraLiveService {
     // Add to local raised hands
     _raisedHandController.add(raisedHand);
     
-    print('Demo mode: Hand raised by ${user.fullName}');
   }
 
   Future<void> lowerHand(app_user.User user) async {
@@ -100,12 +94,10 @@ class AgoraLiveService {
     // Send lower hand message to channel
     await _sendStreamMessage('LOWER_HAND:${user.id}');
     
-    print('Demo mode: Hand lowered by ${user.fullName}');
   }
 
   // Speaker management (for tutors)
   Future<void> approveSpeaker(app_user.User user) async {
-    print('Demo mode: Approving speaker ${user.fullName}');
     
     // Send approval message
     await _sendStreamMessage('APPROVE_SPEAKER:${user.id}');
@@ -123,7 +115,6 @@ class AgoraLiveService {
   }
 
   Future<void> removeSpeaker(app_user.User user) async {
-    print('Demo mode: Removing speaker ${user.fullName}');
     
     // Send removal message
     await _sendStreamMessage('REMOVE_SPEAKER:${user.id}');
@@ -141,7 +132,6 @@ class AgoraLiveService {
   }
 
   Future<void> muteSpeaker(app_user.User user, String reason) async {
-    print('Demo mode: Muting speaker ${user.fullName} - $reason');
     
     // Send mute message
     await _sendStreamMessage('MUTE_SPEAKER:${user.id}:$reason');
@@ -159,7 +149,6 @@ class AgoraLiveService {
   }
 
   Future<void> stopSpeaker(app_user.User user) async {
-    print('Demo mode: Stopping speaker ${user.fullName}');
     
     // Send stop message
     await _sendStreamMessage('STOP_SPEAKER:${user.id}');
@@ -179,7 +168,6 @@ class AgoraLiveService {
   // Send message to channel
   Future<void> _sendStreamMessage(String message) async {
     // In demo mode, just simulate sending
-    print('Demo mode: Sending message - $message');
     
     // Simulate receiving the message
     _handleStreamMessage(message);
@@ -208,7 +196,6 @@ class AgoraLiveService {
       case 'LOWER_HAND':
         if (parts.length >= 2) {
           // Remove from raised hands (simplified)
-          print('Demo mode: Hand lowered by ${parts[1]}');
         }
         break;
         

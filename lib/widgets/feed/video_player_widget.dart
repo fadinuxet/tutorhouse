@@ -54,7 +54,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         }
       }
     } catch (e) {
-      print('Error initializing video: $e');
     }
   }
 

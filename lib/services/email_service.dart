@@ -28,13 +28,9 @@ class EmailService {
         meetLink: meetLink,
       );
       
-      print('📧 Email sent to student: ${student.email}');
-      print('Subject: ${emailContent.subject}');
-      print('Content: ${emailContent.body}');
       
       return true;
     } catch (e) {
-      print('Error sending student email: $e');
       return false;
     }
   }
@@ -61,13 +57,9 @@ class EmailService {
         meetLink: meetLink,
       );
       
-      print('📧 Email sent to tutor: ${tutor.userId}@tutorhouse.co.uk');
-      print('Subject: ${emailContent.subject}');
-      print('Content: ${emailContent.body}');
       
       return true;
     } catch (e) {
-      print('Error sending tutor email: $e');
       return false;
     }
   }

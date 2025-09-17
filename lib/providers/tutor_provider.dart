@@ -15,11 +15,9 @@ class TutorProvider extends ChangeNotifier {
   // Initialize and load tutors
   Future<void> initialize() async {
     if (_isInitialized) {
-      print('✅ TutorProvider already initialized');
       return;
     }
     
-    print('🚀 TutorProvider.initialize() called');
     
     try {
       // Load sample tutors
@@ -29,9 +27,7 @@ class TutorProvider extends ChangeNotifier {
       await _loadBookingDataFromStorage();
       
       _isInitialized = true;
-      print('✅ TutorProvider initialized with ${_tutors.length} tutors');
     } catch (e) {
-      print('❌ Error initializing TutorProvider: $e');
     }
   }
 
@@ -53,10 +49,8 @@ class TutorProvider extends ChangeNotifier {
           }
         }
         
-        print('📂 Loaded booking data for ${bookingData.length} tutors');
       }
     } catch (e) {
-      print('❌ Error loading booking data: $e');
     }
   }
 
@@ -76,27 +70,22 @@ class TutorProvider extends ChangeNotifier {
       final bookingDataJson = jsonEncode(bookingData);
       await prefs.setString('tutor_booking_data', bookingDataJson);
       
-      print('💾 Saved booking data for ${bookingData.length} tutors');
     } catch (e) {
-      print('❌ Error saving booking data: $e');
     }
   }
 
   // Book a trial with a specific tutor
   Future<bool> bookTrialWithTutor(String tutorId, DateTime sessionTime) async {
     try {
-      print('🚀 TutorProvider.bookTrialWithTutor called for tutor: $tutorId');
       
       // Find the tutor
       final tutorIndex = _tutors.indexWhere((tutor) => tutor.id == tutorId);
       if (tutorIndex == -1) {
-        print('❌ Tutor not found: $tutorId');
         return false;
       }
       
       // Check if already booked
       if (_tutors[tutorIndex].hasBookedTrial) {
-        print('❌ Trial already booked for tutor: $tutorId');
         return false;
       }
       
@@ -109,10 +98,8 @@ class TutorProvider extends ChangeNotifier {
       // Notify listeners
       notifyListeners();
       
-      print('✅ Trial booked successfully for tutor: $tutorId at $sessionTime');
       return true;
     } catch (e) {
-      print('❌ Error booking trial: $e');
       return false;
     }
   }
@@ -178,9 +165,7 @@ class TutorProvider extends ChangeNotifier {
       await _saveBookingDataToStorage();
       notifyListeners();
       
-      print('🗑️ All booking data cleared');
     } catch (e) {
-      print('❌ Error clearing booking data: $e');
     }
   }
 }

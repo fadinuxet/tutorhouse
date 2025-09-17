@@ -3,7 +3,6 @@ import '../config/demo_config.dart';
 import 'supabase_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'dart:html' as html;
 
 class AuthService {
   // Demo mode - no real authentication
@@ -48,28 +47,22 @@ class AuthService {
   // Initialize AuthService and load saved user
   static Future<void> initialize() async {
     if (_isInitialized) {
-      print('✅ AuthService already initialized');
       return;
     }
     
-    print('🚀 AuthService.initialize() called');
     
     try {
       // Load existing user data from storage for persistent login
       await _loadUserFromStorage();
-      print('💾 Loaded user data from storage');
       
       _isInitialized = true;
-      print('✅ AuthService initialized successfully - isAuthenticated: $isAuthenticated');
     } catch (e) {
-      print('❌ Error initializing AuthService: $e');
     }
   }
   
   // Save user and token to SharedPreferences and localStorage
   static Future<void> _saveUserToStorage(app_user.User user) async {
     try {
-      print('💾 AuthService._saveUserToStorage - Starting...');
       
       // Generate JWT token
       _authToken = _generateDemoToken();
@@ -85,81 +78,59 @@ class AuthService {
         'authToken': _authToken,
         'tokenExpiry': _tokenExpiry!.toIso8601String(),
       };
-      print('💾 User data prepared: $userData');
       
       final userJson = jsonEncode(userData);
-      print('💾 JSON encoded: $userJson');
       
       // Try SharedPreferences first
       try {
         final prefs = await SharedPreferences.getInstance();
-        print('💾 SharedPreferences instance obtained');
         
         final success = await prefs.setString('current_user', userJson);
-        print('💾 SharedPreferences.setString result: $success');
         
         // Verify the save by reading it back
         final savedData = prefs.getString('current_user');
-        print('💾 SharedPreferences verification - saved data: $savedData');
       } catch (e) {
-        print('❌ SharedPreferences error: $e');
       }
       
-      // Also save to localStorage as backup
+      // Also save to SharedPreferences as backup
       try {
-        html.window.localStorage['current_user'] = userJson;
-        print('💾 localStorage backup saved');
-        
-        // Verify localStorage
-        final localStorageData = html.window.localStorage['current_user'];
-        print('💾 localStorage verification - saved data: $localStorageData');
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('current_user', userJson);
       } catch (e) {
-        print('❌ localStorage error: $e');
       }
       
-      print('💾 User and token saved to storage: ${user.email}');
     } catch (e) {
-      print('❌ Error saving user to storage: $e');
-      print('❌ Error details: ${e.toString()}');
     }
   }
   
   // Load user and token from SharedPreferences and localStorage
   static Future<void> _loadUserFromStorage() async {
     try {
-      print('🔍 AuthService._loadUserFromStorage - Starting...');
       
       String? userJson;
       
       // Try SharedPreferences first
       try {
         final prefs = await SharedPreferences.getInstance();
-        print('🔍 SharedPreferences instance obtained');
         
         // Try to get all keys to debug
         final keys = prefs.getKeys();
-        print('🔍 Available keys in SharedPreferences: $keys');
         
         userJson = prefs.getString('current_user');
-        print('🔍 SharedPreferences userJson: $userJson');
       } catch (e) {
-        print('❌ SharedPreferences error: $e');
       }
       
-      // If SharedPreferences failed or returned null, try localStorage
+      // If SharedPreferences failed or returned null, try again
       if (userJson == null || userJson.isEmpty) {
         try {
-          userJson = html.window.localStorage['current_user'];
-          print('🔍 localStorage userJson: $userJson');
+          final prefs = await SharedPreferences.getInstance();
+          userJson = prefs.getString('current_user');
         } catch (e) {
-          print('❌ localStorage error: $e');
         }
       }
       
       if (userJson != null && userJson.isNotEmpty) {
-        print('🔍 User data found, parsing...');
         final userData = jsonDecode(userJson);
-        print('🔍 Parsed user data: $userData');
         
         // Load user data
         _currentUser = app_user.User(
@@ -181,30 +152,22 @@ class AuthService {
         
         // Validate token
         if (!_isTokenValid()) {
-          print('❌ Token expired, clearing user data');
           await _clearUserFromStorage();
           _currentUser = null;
           _authToken = null;
           _tokenExpiry = null;
         } else {
-          print('✅ User and valid token loaded from storage: ${_currentUser?.email}');
-          print('✅ Token expires at: $_tokenExpiry');
-          print('✅ AuthService.isAuthenticated: $isAuthenticated');
           
           // Generate a new token to extend the session
           _authToken = _generateDemoToken();
           _tokenExpiry = DateTime.now().add(const Duration(hours: 24));
-          print('🔄 Generated new token for extended session');
         }
       } else {
-        print('❌ No user data found in any storage');
         _currentUser = null;
         _authToken = null;
         _tokenExpiry = null;
       }
     } catch (e) {
-      print('❌ Error loading user from storage: $e');
-      print('❌ Error details: ${e.toString()}');
       _currentUser = null;
       _authToken = null;
       _tokenExpiry = null;
@@ -218,17 +181,7 @@ class AuthService {
       try {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('current_user');
-        print('🗑️ User and token cleared from SharedPreferences');
       } catch (e) {
-        print('❌ Error clearing SharedPreferences: $e');
-      }
-      
-      // Clear localStorage
-      try {
-        html.window.localStorage.remove('current_user');
-        print('🗑️ User and token cleared from localStorage');
-      } catch (e) {
-        print('❌ Error clearing localStorage: $e');
       }
       
       // Clear in-memory data
@@ -236,9 +189,7 @@ class AuthService {
       _authToken = null;
       _tokenExpiry = null;
       
-      print('🗑️ User and token cleared from all storage and memory');
     } catch (e) {
-      print('❌ Error clearing user from storage: $e');
     }
   }
 
@@ -424,7 +375,6 @@ class AuthService {
 
   // Sign out (demo mode)
   static Future<void> signOut() async {
-    print('🚪 AuthService.signOut called');
     // Clear current user and token
     _currentUser = null;
     _authToken = null;
@@ -432,17 +382,14 @@ class AuthService {
     await _clearUserFromStorage();
     // Simulate API call
     await Future.delayed(const Duration(milliseconds: 500));
-    print('✅ User signed out and all data cleared successfully');
   }
   
   // Force logout (clears everything without confirmation)
   static Future<void> forceLogout() async {
-    print('🚪 AuthService.forceLogout called');
     _currentUser = null;
     _authToken = null;
     _tokenExpiry = null;
     await _clearUserFromStorage();
-    print('✅ Force logout completed');
   }
 
   // Reset password (demo mode)

@@ -1,5 +1,4 @@
 import 'dart:math';
-import '../config/google_config.dart';
 
 class GoogleMeetService {
   static final GoogleMeetService _instance = GoogleMeetService._internal();
@@ -106,9 +105,6 @@ class GoogleMeetService {
     
     await Future.delayed(const Duration(seconds: 1)); // Simulate API call
     
-    print('📅 Calendar event created: ${event.title}');
-    print('🔗 Google Meet link: ${event.meetLink}');
-    print('👥 Attendees: ${event.attendees.map((a) => a.name).join(', ')}');
     
     return true;
   }

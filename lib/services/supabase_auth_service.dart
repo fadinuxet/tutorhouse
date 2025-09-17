@@ -105,7 +105,6 @@ class SupabaseAuthService {
         'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      print('Error creating tutor profile: $e');
     }
   }
 
@@ -120,7 +119,6 @@ class SupabaseAuthService {
         'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      print('Error creating student profile: $e');
     }
   }
 
@@ -163,7 +161,6 @@ class SupabaseAuthService {
         return response;
       }
     } catch (e) {
-      print('Error getting user profile: $e');
       return null;
     }
   }

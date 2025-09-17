@@ -8,10 +8,8 @@ class PaymentService {
     try {
       // For demo mode, we'll skip real payment initialization
       _isInitialized = true;
-      print('Payment service initialized in demo mode');
       return true;
     } catch (e) {
-      print('Failed to initialize payment service: $e');
       return false;
     }
   }
@@ -24,7 +22,6 @@ class PaymentService {
     required String description,
   }) async {
     if (!_isInitialized) {
-      print('Payment service not initialized');
       return null;
     }
 

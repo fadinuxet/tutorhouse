@@ -47,7 +47,6 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
         });
       }
     } catch (e) {
-      print('Error initializing camera: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error initializing camera: $e'),
@@ -77,7 +76,6 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
       // Start timer
       _startTimer();
     } catch (e) {
-      print('Error starting recording: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error starting recording: $e'),
@@ -102,7 +100,6 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
       widget.onVideoRecorded(videoFile.path);
       Navigator.of(context).pop();
     } catch (e) {
-      print('Error stopping recording: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error stopping recording: $e'),

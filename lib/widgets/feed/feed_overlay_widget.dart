@@ -67,7 +67,6 @@ class _FeedOverlayWidgetState extends State<FeedOverlayWidget> {
         });
       }
     } catch (e) {
-      print('Error loading tutor: $e');
     }
   }
 

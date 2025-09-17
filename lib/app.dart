@@ -27,7 +27,6 @@ class _TutorhouseAppState extends ConsumerState<TutorhouseApp> {
     try {
       await ref.read(authProvider).initialize();
     } catch (e) {
-      print('❌ TutorhouseApp: Error initializing services: $e');
     } finally {
       if (mounted) {
         setState(() {
